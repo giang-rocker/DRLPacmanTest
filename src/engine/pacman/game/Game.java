@@ -117,7 +117,9 @@ public final class Game {
         this(seed, 0, messenger);
         
     }
-
+    
+    
+    
     public Game(long seed, int initialMaze, Messenger messenger) {
         this.seed = seed;
         rnd = new Random(seed);

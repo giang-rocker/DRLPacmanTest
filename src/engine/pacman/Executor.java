@@ -349,6 +349,41 @@ public class Executor {
         pacManController.terminate();
         ghostController.terminate();
     }
+    
+    public void runGameTimedSpecificMaze(Controller<MOVE> pacManController, Controller<EnumMap<GHOST, MOVE>> ghostController, boolean visual, int mazeIndex) {
+        Game game = (this.ghostsMessage) ? new Game(0,mazeIndex, messenger.copy()) : new Game(0,mazeIndex);
+
+        GameView gv = null;
+
+        if (visual)
+            gv = new GameView(game).showGame();
+
+        if (pacManController instanceof HumanController)
+            gv.getFrame().addKeyListener(((HumanController) pacManController).getKeyboardInput());
+
+        new Thread(pacManController).start();
+        new Thread(ghostController).start();
+
+        while (!game.gameOver()) {
+            pacManController.update(game.copy((pacmanPO) ? GHOST.values().length + 1 : -1), System.currentTimeMillis() + DELAY);
+            ghostController.update(game.copy(), System.currentTimeMillis() + DELAY);
+
+            try {
+                Thread.sleep(DELAY);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            game.advanceGame(pacManController.getMove(), ghostController.getMove());
+
+            if (visual)
+                gv.repaint();
+        }
+
+        pacManController.terminate();
+        ghostController.terminate();
+    }
+
 
     /**
      * Run the game in asynchronous mode but proceed as soon as both controllers replied. The time limit still applies so

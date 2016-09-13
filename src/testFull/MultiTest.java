@@ -1,0 +1,108 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package testFull;
+
+import engine.pacman.controllers.Controller;
+import engine.pacman.controllers.HumanController;
+import engine.pacman.game.Constants;
+import static engine.pacman.game.Constants.DELAY;
+import engine.pacman.game.Constants.MOVE;
+import engine.pacman.game.Game;
+import engine.pacman.game.GameView;
+import engine.pacman.game.comms.BasicMessenger;
+import engine.pacman.game.comms.Messenger;
+import engine.pacman.game.util.Stats;
+import examples.commGhosts.POCommGhosts;
+import java.io.IOException;
+import java.util.EnumMap;
+import java.util.Random;
+ 
+
+/**
+ *
+ * @author Giang
+ */
+public class MultiTest {
+
+    public Stats[] runExperiment(Controller<MOVE> pacManController, Controller<EnumMap<Constants.GHOST, MOVE>> ghostController, int trials, String description, int tickLimit, boolean visual) {
+        Stats stats = new Stats(description);
+        Stats ticks = new Stats(description + " Ticks");
+        Random rnd = new Random(0);
+        Game game;
+        Messenger messenger;
+        messenger = new BasicMessenger(0, 1, 1);
+
+        Long startTime = System.currentTimeMillis();
+        for (int i = 0; i < trials;) {
+
+            try {
+                game = new Game(rnd.nextLong(), messenger.copy());
+
+                GameView gv = null;
+
+                if (visual) {
+                    gv = new GameView(game).showGame();
+                    gv.getFrame().setLocation(200, 600);
+                    gv.getFrame().setTitle("Experiment for MyPacMan");
+
+                    if (pacManController instanceof HumanController) {
+//                System.out.println("Here");
+                        gv.setFocusable(true);
+                        gv.requestFocus();
+                        gv.setPO(true);
+                        gv.addKeyListener(((HumanController) pacManController).getKeyboardInput());
+//                System.out.println("KeyListener added");
+                    }
+                }
+
+                while (!game.gameOver()) {
+                    if (tickLimit != -1 && tickLimit < game.getCurrentLevelTime()) {
+                        break;
+                    }
+                    game.advanceGame(
+                            pacManController.getMove(game.copy((true) ? Constants.GHOST.values().length + 1 : -1), System.currentTimeMillis() + DELAY),
+                            ghostController.getMove(game.copy(), System.currentTimeMillis() + DELAY));
+
+                    if (visual) {
+                        gv.repaint();
+                    }
+                }
+                stats.add(game.getScore());
+                ticks.add(game.getCurrentLevelTime());
+                i++;
+                System.out.println("Game finished: " + i + "  Score: " + game.getScore() + " Maze: " + game.getCurrentLevel() + " Time: " + game.getTotalTime());
+                if(visual)
+                gv.getFrame().dispose();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        long timeTaken = System.currentTimeMillis() - startTime;
+        stats.setMsTaken(timeTaken);
+        ticks.setMsTaken(timeTaken);
+
+        return new Stats[]{stats, ticks};
+    }
+
+    public static void main(String[] args) throws IOException {
+        System.out.println("START EXPERIEMNT MY PACMAN FULL INFOMATION - NO PO");
+
+        int numOfGame = 100;//Integer.parseInt(args[0]);
+        System.out.println("RUN " + numOfGame + " games");
+
+        MultiTest mt = new MultiTest();
+
+        Stats stats[] = mt.runExperiment(new MyPacMan(), new POCommGhosts(50), numOfGame, " DONE ", -1, false);
+
+        for (int i = 0; i < stats.length; i++) {
+            System.out.println(stats[i]);
+        }
+
+        System.out.println("END");
+
+    }
+
+}

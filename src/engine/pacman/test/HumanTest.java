@@ -1,16 +1,16 @@
-package pacman.test;
+package engine.pacman.test;
 
-import pacman.Executor;
-import pacman.controllers.HumanController;
-import pacman.controllers.KeyBoardInput;
-import pacman.controllers.PacmanController;
-import pacman.controllers.examples.po.POCommGhosts;
-import pacman.controllers.examples.po.POPacMan;
-import pacman.game.Constants;
-import pacman.game.Game;
-import pacman.game.GameView;
-import pacman.game.comms.BasicMessenger;
-import pacman.game.internal.POType;
+import engine.pacman.Executor;
+import engine.pacman.controllers.HumanController;
+import engine.pacman.controllers.KeyBoardInput;
+import engine.pacman.controllers.PacmanController;
+import engine.pacman.controllers.examples.po.POCommGhosts;
+import engine.pacman.controllers.examples.po.POPacMan;
+import engine.pacman.game.Constants;
+import engine.pacman.game.Game;
+import engine.pacman.game.GameView;
+import engine.pacman.game.comms.BasicMessenger;
+import engine.pacman.game.internal.POType;
 
 import java.util.EnumMap;
 

@@ -1,14 +1,14 @@
-package pacman.controllers.examples;
+package engine.pacman.controllers.examples;
 
-import pacman.controllers.PacmanController;
-import pacman.game.Constants.DM;
-import pacman.game.Game;
-import pacman.game.GameView;
+import engine.pacman.controllers.PacmanController;
+import engine.pacman.game.Constants.DM;
+import engine.pacman.game.Constants.GHOST;
+import engine.pacman.game.Constants.MOVE;
+import engine.pacman.game.Game;
+import engine.pacman.game.GameView;
 
 import java.awt.*;
 
-import static pacman.game.Constants.GHOST;
-import static pacman.game.Constants.MOVE;
 
 /*
  * Same as NearestPillPacMan but does some visuals to illustrate what can be done.

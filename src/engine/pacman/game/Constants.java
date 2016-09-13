@@ -1,4 +1,4 @@
-package pacman.game;
+package engine.pacman.game;
 
 /**
  * This class contains the enumerations for the moves and the ghosts as well as

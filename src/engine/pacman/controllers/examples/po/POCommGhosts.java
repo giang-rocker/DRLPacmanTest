@@ -1,13 +1,13 @@
-package pacman.controllers.examples.po;
+package engine.pacman.controllers.examples.po;
 
-import pacman.controllers.Controller;
-import pacman.game.Constants.DM;
-import pacman.game.Constants.GHOST;
-import pacman.game.Constants.MOVE;
-import pacman.game.Game;
-import pacman.game.comms.BasicMessage;
-import pacman.game.comms.Message;
-import pacman.game.comms.Messenger;
+import engine.pacman.controllers.Controller;
+import engine.pacman.game.Constants.DM;
+import engine.pacman.game.Constants.GHOST;
+import engine.pacman.game.Constants.MOVE;
+import engine.pacman.game.Game;
+import engine.pacman.game.comms.BasicMessage;
+import engine.pacman.game.comms.Message;
+import engine.pacman.game.comms.Messenger;
 
 import java.util.EnumMap;
 import java.util.Random;

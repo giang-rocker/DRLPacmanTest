@@ -1,12 +1,14 @@
 package examples.poPacMan;
 
-import pacman.controllers.PacmanController;
-import pacman.game.Game;
+import engine.pacman.controllers.PacmanController;
+import engine.pacman.game.Constants.DM;
+import engine.pacman.game.Constants.GHOST;
+import engine.pacman.game.Constants.MOVE;
+import engine.pacman.game.Game;
 
 import java.util.ArrayList;
 import java.util.Random;
 
-import static pacman.game.Constants.*;
 
 /**
  * Created by Piers on 15/02/2016.

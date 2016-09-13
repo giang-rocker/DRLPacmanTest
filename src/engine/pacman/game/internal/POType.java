@@ -1,4 +1,4 @@
-package pacman.game.internal;
+package engine.pacman.game.internal;
 
 /**
  * Created by Piers on 17/08/2016.

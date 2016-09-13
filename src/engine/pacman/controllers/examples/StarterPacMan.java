@@ -1,11 +1,13 @@
-package pacman.controllers.examples;
+package engine.pacman.controllers.examples;
 
-import pacman.controllers.PacmanController;
-import pacman.game.Game;
+import engine.pacman.controllers.PacmanController;
+import engine.pacman.game.Constants.DM;
+import engine.pacman.game.Constants.GHOST;
+import engine.pacman.game.Constants.MOVE;
+import engine.pacman.game.Game;
 
 import java.util.ArrayList;
 
-import static pacman.game.Constants.*;
 
 /*
  * Pac-Man controller as part of the starter package - simply upload this file as a zip called

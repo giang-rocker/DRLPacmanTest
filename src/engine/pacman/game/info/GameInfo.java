@@ -1,8 +1,8 @@
-package pacman.game.info;
+package engine.pacman.game.info;
 
-import pacman.game.Constants;
-import pacman.game.internal.Ghost;
-import pacman.game.internal.PacMan;
+import engine.pacman.game.Constants;
+import engine.pacman.game.internal.Ghost;
+import engine.pacman.game.internal.PacMan;
 
 import java.util.BitSet;
 import java.util.EnumMap;

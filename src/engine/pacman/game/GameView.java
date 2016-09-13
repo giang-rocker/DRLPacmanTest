@@ -1,8 +1,14 @@
-package pacman.game;
+package engine.pacman.game;
 
-import pacman.game.Constants.*;
-import pacman.game.internal.Node;
-import pacman.game.internal.PacMan;
+import engine.pacman.game.Constants.*;
+import static engine.pacman.game.Constants.EDIBLE_ALERT;
+import static engine.pacman.game.Constants.GV_HEIGHT;
+import static engine.pacman.game.Constants.GV_WIDTH;
+import static engine.pacman.game.Constants.MAG;
+import static engine.pacman.game.Constants.mazeNames;
+import static engine.pacman.game.Constants.pathImages;
+import engine.pacman.game.internal.Node;
+import engine.pacman.game.internal.PacMan;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -15,7 +21,6 @@ import java.util.EnumMap;
 import java.util.Vector;
 import static javax.swing.JFrame.EXIT_ON_CLOSE;
 
-import static pacman.game.Constants.*;
 
 /**
  * This class is the view that displays the game. The only thing contestants might need to know

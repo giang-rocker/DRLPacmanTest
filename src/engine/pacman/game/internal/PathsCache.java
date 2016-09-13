@@ -1,7 +1,7 @@
-package pacman.game.internal;
+package engine.pacman.game.internal;
 
-import pacman.game.Constants.MOVE;
-import pacman.game.Game;
+import engine.pacman.game.Constants.MOVE;
+import engine.pacman.game.Game;
 
 import java.util.*;
 

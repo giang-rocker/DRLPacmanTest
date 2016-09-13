@@ -1,6 +1,6 @@
-package pacman.controllers;
+package engine.pacman.controllers;
 
-import pacman.game.Constants;
+import engine.pacman.game.Constants;
 
 /**
  * Essentially a tagging to make the loading of entrants easier

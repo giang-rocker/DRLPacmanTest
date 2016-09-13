@@ -1,19 +1,23 @@
-package pacman;
+package engine.pacman;
 
-import pacman.controllers.Controller;
-import pacman.controllers.HumanController;
-import pacman.game.Game;
-import pacman.game.GameView;
-import pacman.game.comms.BasicMessenger;
-import pacman.game.comms.Messenger;
-import pacman.game.util.Stats;
+import engine.pacman.controllers.Controller;
+import engine.pacman.controllers.HumanController;
+import static engine.pacman.game.Constants.DELAY;
+import engine.pacman.game.Constants.GHOST;
+import static engine.pacman.game.Constants.INTERVAL_WAIT;
+import engine.pacman.game.Constants.MOVE;
+import engine.pacman.game.Game;
+import engine.pacman.game.GameView;
+import engine.pacman.game.comms.BasicMessenger;
+import engine.pacman.game.comms.Messenger;
+import engine.pacman.game.util.Stats;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.Random;
 
-import static pacman.game.Constants.*;
+ 
 
 /**
  * This class may be used to execute the game in timed or un-timed modes, with or without
@@ -349,6 +353,41 @@ public class Executor {
         pacManController.terminate();
         ghostController.terminate();
     }
+    
+    public void runGameTimedSpecificMaze(Controller<MOVE> pacManController, Controller<EnumMap<GHOST, MOVE>> ghostController, boolean visual, int mazeIndex) {
+        Game game = (this.ghostsMessage) ? new Game(0,mazeIndex, messenger.copy()) : new Game(0,mazeIndex);
+
+        GameView gv = null;
+
+        if (visual)
+            gv = new GameView(game).showGame();
+
+        if (pacManController instanceof HumanController)
+            gv.getFrame().addKeyListener(((HumanController) pacManController).getKeyboardInput());
+
+        new Thread(pacManController).start();
+        new Thread(ghostController).start();
+
+        while (!game.gameOver()) {
+            pacManController.update(game.copy((pacmanPO) ? GHOST.values().length + 1 : -1), System.currentTimeMillis() + DELAY);
+            ghostController.update(game.copy(), System.currentTimeMillis() + DELAY);
+
+            try {
+                Thread.sleep(DELAY);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            game.advanceGame(pacManController.getMove(), ghostController.getMove());
+
+            if (visual)
+                gv.repaint();
+        }
+
+        pacManController.terminate();
+        ghostController.terminate();
+    }
+
 
     /**
      * Run the game in asynchronous mode but proceed as soon as both controllers replied. The time limit still applies so

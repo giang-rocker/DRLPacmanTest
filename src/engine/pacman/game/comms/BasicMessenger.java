@@ -1,6 +1,6 @@
-package pacman.game.comms;
+package engine.pacman.game.comms;
 
-import pacman.game.Constants;
+import engine.pacman.game.Constants;
 
 import java.util.ArrayList;
 import java.util.Map;

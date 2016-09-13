@@ -1,11 +1,15 @@
-package pacman.game.internal;
+package engine.pacman.game.internal;
 
+import static engine.pacman.game.Constants.distNames;
+import static engine.pacman.game.Constants.nodeNames;
+import static engine.pacman.game.Constants.pathDistances;
+import static engine.pacman.game.Constants.pathMazes;
+import java.io.File;
 import java.util.Scanner;
 
-import static pacman.game.Constants.*;
 
 //import java.util.EnumMap;
-//import pacman.game.Constants.MOVE;
+//import engine.pacman.game.Constants.MOVE;
 
 /*
  * Stores the actual mazes, each of which is simply a connected graph. The differences between the mazes are the connectivity
@@ -38,7 +42,10 @@ public final class Maze {
 
     //Loads all the nodes from files and initialises all maze-specific information.
     private void loadNodes(String fileName) {
-
+    
+          
+        
+       
         Scanner scanner = new Scanner(getClass().getResourceAsStream(pathMazes + "/" + fileName + ".txt"));
         String input = scanner.nextLine();
 

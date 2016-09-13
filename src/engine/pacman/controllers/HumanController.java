@@ -1,7 +1,7 @@
-package pacman.controllers;
+package engine.pacman.controllers;
 
-import pacman.game.Constants.MOVE;
-import pacman.game.Game;
+import engine.pacman.game.Constants.MOVE;
+import engine.pacman.game.Game;
 
 import java.awt.event.KeyEvent;
 

@@ -1,4 +1,4 @@
-package pacman.test;
+package engine.pacman.test;
 
 import javax.swing.*;
 import java.awt.*;

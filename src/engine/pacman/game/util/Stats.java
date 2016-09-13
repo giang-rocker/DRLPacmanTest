@@ -1,4 +1,4 @@
-package pacman.game.util;
+package engine.pacman.game.util;
 
 /**
  * Holds iteratively built statistical observations without storing the individual observations

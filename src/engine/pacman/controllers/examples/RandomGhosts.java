@@ -1,9 +1,9 @@
-package pacman.controllers.examples;
+package engine.pacman.controllers.examples;
 
-import pacman.controllers.Controller;
-import pacman.game.Constants.GHOST;
-import pacman.game.Constants.MOVE;
-import pacman.game.Game;
+import engine.pacman.controllers.Controller;
+import engine.pacman.game.Constants.GHOST;
+import engine.pacman.game.Constants.MOVE;
+import engine.pacman.game.Game;
 
 import java.util.EnumMap;
 import java.util.Random;

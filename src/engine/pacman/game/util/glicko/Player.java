@@ -1,4 +1,4 @@
-package pacman.game.util.glicko;
+package engine.pacman.game.util.glicko;
 
 import java.util.HashMap;
 import java.util.Map;

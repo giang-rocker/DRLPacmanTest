@@ -1,20 +1,32 @@
-package pacman.game;
+package engine.pacman.game;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import pacman.game.Constants.*;
-import pacman.game.comms.Messenger;
-import pacman.game.info.GameInfo;
-import pacman.game.internal.*;
+import engine.pacman.game.Constants.*;
+import static engine.pacman.game.Constants.AWARD_LIFE_LEFT;
+import static engine.pacman.game.Constants.COMMON_LAIR_TIME;
+import static engine.pacman.game.Constants.EAT_DISTANCE;
+import static engine.pacman.game.Constants.EDIBLE_TIME;
+import static engine.pacman.game.Constants.EDIBLE_TIME_REDUCTION;
+import static engine.pacman.game.Constants.EXTRA_LIFE_SCORE;
+import static engine.pacman.game.Constants.GHOST_EAT_SCORE;
+import static engine.pacman.game.Constants.GHOST_REVERSAL;
+import static engine.pacman.game.Constants.GHOST_SPEED_REDUCTION;
+import static engine.pacman.game.Constants.LAIR_REDUCTION;
+import static engine.pacman.game.Constants.LEVEL_LIMIT;
+import static engine.pacman.game.Constants.LEVEL_RESET_REDUCTION;
+import static engine.pacman.game.Constants.MAX_TIME;
+import static engine.pacman.game.Constants.NUM_GHOSTS;
+import static engine.pacman.game.Constants.NUM_LIVES;
+import static engine.pacman.game.Constants.NUM_MAZES;
+import static engine.pacman.game.Constants.PILL;
+import static engine.pacman.game.Constants.POWER_PILL;
+import engine.pacman.game.comms.Messenger;
+import engine.pacman.game.info.GameInfo;
+import engine.pacman.game.internal.*;
 
 import java.util.BitSet;
 import java.util.EnumMap;
 import java.util.Map.Entry;
 import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import static pacman.game.Constants.*;
 
 /**
  * The implementation of Ms Pac-Man. This class contains the game engine and all methods required to
@@ -117,7 +129,9 @@ public final class Game {
         this(seed, 0, messenger);
         
     }
-
+    
+    
+    
     public Game(long seed, int initialMaze, Messenger messenger) {
         this.seed = seed;
         rnd = new Random(seed);

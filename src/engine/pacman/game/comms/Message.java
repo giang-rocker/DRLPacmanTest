@@ -1,6 +1,6 @@
-package pacman.game.comms;
+package engine.pacman.game.comms;
 
-import pacman.game.Constants.GHOST;
+import engine.pacman.game.Constants.GHOST;
 
 /**
  * Represents a message for the game.

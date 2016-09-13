@@ -1,10 +1,10 @@
-package pacman.entries.ghostMAS.pwillic;
+package engine.pacman.entries.ghostMAS.pwillic;
 
-import pacman.game.Constants;
-import pacman.game.Game;
-import pacman.game.comms.BasicMessage;
-import pacman.game.comms.Message;
-import pacman.game.comms.Messenger;
+import engine.pacman.game.Constants;
+import engine.pacman.game.Game;
+import engine.pacman.game.comms.BasicMessage;
+import engine.pacman.game.comms.Message;
+import engine.pacman.game.comms.Messenger;
 
 import java.util.Random;
 

@@ -1,15 +1,15 @@
-package pacman.test;
+package engine.pacman.test;
 
-import pacman.game.Game;
-import pacman.game.comms.BasicMessenger;
-import pacman.game.info.GameInfo;
-import pacman.game.internal.Ghost;
-import pacman.game.internal.PacMan;
+import engine.pacman.game.Constants.GHOST;
+import engine.pacman.game.Constants.MOVE;
+import engine.pacman.game.Game;
+import engine.pacman.game.comms.BasicMessenger;
+import engine.pacman.game.info.GameInfo;
+import engine.pacman.game.internal.Ghost;
+import engine.pacman.game.internal.PacMan;
 
 import java.util.EnumMap;
 
-import static pacman.game.Constants.GHOST;
-import static pacman.game.Constants.MOVE;
 
 /**
  * Created by pwillic on 09/05/2016.

@@ -1,8 +1,8 @@
-package pacman.entries.pacman;
+package engine.pacman.entries.pacman;
 
-import pacman.controllers.PacmanController;
-import pacman.game.Constants.MOVE;
-import pacman.game.Game;
+import engine.pacman.controllers.PacmanController;
+import engine.pacman.game.Constants.MOVE;
+import engine.pacman.game.Game;
 
 /*
  * This is the class you need to modify for your entry. In particular, you need to

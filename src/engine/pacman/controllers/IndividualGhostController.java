@@ -1,8 +1,8 @@
-package pacman.controllers;
+package engine.pacman.controllers;
 
-import pacman.game.Constants.GHOST;
-import pacman.game.Constants.MOVE;
-import pacman.game.Game;
+import engine.pacman.game.Constants.GHOST;
+import engine.pacman.game.Constants.MOVE;
+import engine.pacman.game.Game;
 
 /**
  * Created by Piers on 11/11/2015.

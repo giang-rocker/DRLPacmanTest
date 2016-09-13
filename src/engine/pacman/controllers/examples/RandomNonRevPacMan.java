@@ -1,11 +1,11 @@
-package pacman.controllers.examples;
+package engine.pacman.controllers.examples;
 
-import pacman.controllers.PacmanController;
-import pacman.game.Game;
+import engine.pacman.controllers.PacmanController;
+import engine.pacman.game.Constants.MOVE;
+import engine.pacman.game.Game;
 
 import java.util.Random;
 
-import static pacman.game.Constants.MOVE;
 
 /*
  * The Class RandomNonRevPacMan.

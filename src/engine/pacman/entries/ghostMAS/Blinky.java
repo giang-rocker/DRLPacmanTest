@@ -1,8 +1,8 @@
-package pacman.entries.ghostMAS;
+package engine.pacman.entries.ghostMAS;
 
-import pacman.controllers.IndividualGhostController;
-import pacman.game.Constants;
-import pacman.game.Game;
+import engine.pacman.controllers.IndividualGhostController;
+import engine.pacman.game.Constants;
+import engine.pacman.game.Game;
 
 /**
  * Created by Piers on 11/11/2015.

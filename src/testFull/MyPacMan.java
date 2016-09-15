@@ -1,5 +1,6 @@
 package testFull;
 
+import engine.pacman.Executor;
 import engine.pacman.controllers.PacmanController;
 import engine.pacman.game.Constants.GHOST;
 import engine.pacman.game.Constants.MOVE;
@@ -7,6 +8,7 @@ import engine.pacman.game.Game;
 import engine.pacman.game.info.GameInfo;
 import engine.pacman.game.internal.Ghost;
 import engine.pacman.game.internal.PacMan;
+import examples.commGhosts.POCommGhosts;
 import java.util.EnumMap;
  
 
@@ -146,6 +148,8 @@ public class MyPacMan extends PacmanController {
     }
     
     public static void main(String[] args){
-    
+        Executor ex = new Executor(true, true);
+         
+        ex.runGameTimed(new MyPacMan(), new POCommGhosts(50), true);
     }
 }

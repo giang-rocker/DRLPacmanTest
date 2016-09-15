@@ -5,6 +5,7 @@
  */
 package extractorpacman;
 
+import engine.pacman.game.Constants.GHOST;
 import java.awt.Color;
 import java.awt.Graphics;
 import static java.lang.Thread.sleep;
@@ -12,10 +13,10 @@ import java.lang.reflect.Array;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import engine.pacman.game.Constants;
 import engine.pacman.game.Constants.MOVE;
 import engine.pacman.game.Game;
 import engine.pacman.game.internal.Node;
+import pacman.game.*;
 
 /**
  *
@@ -107,16 +108,35 @@ public class ExtractorForm extends javax.swing.JFrame {
         
         for (int i =minX; i <=maxX; i ++)
             for (int j =minY; j <=maxY; j ++){
-             //   if (maze [i][j]==1)
-             //       g.setColor(Color.gray);
-             
-             if (maze[i][j]==2)
+                if (maze [i][j]==1)
+                    g.setColor(Color.blue);
+           else  if (maze[i][j]==2)
                     g.setColor(Color.red);
              else  
                  g.setColor(Color.DARK_GRAY);
         
-              g.fillRect(margin + j*scale+ 1*scale/2 , margin + i*scale+ 1*scale/2, 1*scale/2, 1*scale/2);
+              g.fillRect(margin + j*scale - scale/3 , margin + i*scale - scale/3, 2*scale/3, 2*scale/3);
             }
+        
+        
+        // draw Pacman
+        g.setColor(Color.YELLOW);
+        int X = game.getNodeXCood(game.getPacmanCurrentNodeIndex());
+        int Y = game.getNodeYCood(game.getPacmanCurrentNodeIndex());
+        
+        g.fillOval(margin + X*scale - 3*scale/2 , margin + Y*scale - 3*scale/2, 3*scale, 3*scale);
+        
+        Color[] listGhostColor = new Color [] { Color.PINK,Color.CYAN, Color.ORANGE, Color.RED };    
+        int index =0;
+        for(GHOST ghost : GHOST.values()) {
+         X = game.getNodeXCood(game.getGhostCurrentNodeIndex(ghost));
+         Y = game.getNodeYCood(game.getGhostCurrentNodeIndex(ghost));
+         
+         g.setColor(listGhostColor[index++]);
+            g.fillOval(margin + X*scale - 3*scale/2 , margin + Y*scale - 3*scale/2, 3*scale, 3*scale);
+    
+        
+        }
     }
     
     /**

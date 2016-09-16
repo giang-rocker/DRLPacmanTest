@@ -1,6 +1,8 @@
 package testFull;
 
 import engine.pacman.Executor;
+import engine.pacman.controllers.HumanController;
+import engine.pacman.controllers.KeyBoardInput;
 import engine.pacman.controllers.PacmanController;
 import engine.pacman.game.Constants.GHOST;
 import engine.pacman.game.Constants.MOVE;
@@ -149,7 +151,8 @@ public class MyPacMan extends PacmanController {
     
     public static void main(String[] args){
         Executor ex = new Executor(true, true);
-         
-        ex.runGameTimed(new MyPacMan(), new POCommGhosts(50), true);
+        
+        ex.runGamePO(new MyPacMan(), new POCommGhosts(50), true);
+    //ex.runGame(new HumanController(new KeyBoardInput()), new POCommGhosts(50), true, 40);
     }
 }

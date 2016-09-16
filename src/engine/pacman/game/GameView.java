@@ -312,7 +312,7 @@ public final class GameView extends JComponent {
         int pacmanLocation = game.getPacmanCurrentNodeIndex();
 //        overlay.fillRect(0, 0, GV_WIDTH * MAG, GV_HEIGHT * MAG);
 
-        overlay.setColor(Color.GRAY);
+        overlay.setColor(Color.black);
         for (int i = 0; i < game.getNumberOfNodes(); i++) {
             if (!pacmanGame.isNodeObservable(i)) {
                 overlay.fillRect(

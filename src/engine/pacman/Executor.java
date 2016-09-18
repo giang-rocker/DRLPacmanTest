@@ -325,8 +325,10 @@ public class Executor {
 
         GameView gv = null;
 
-        if (visual)
+        if (visual){
             gv = new GameView(game).showGame();
+      //      gv.setPO(true);
+        }
 
         if (pacManController instanceof HumanController)
             gv.getFrame().addKeyListener(((HumanController) pacManController).getKeyboardInput());

@@ -11,8 +11,10 @@ import java.awt.Graphics;
 import engine.pacman.game.Game;
 import engine.pacman.game.internal.Node;
 import java.awt.Checkbox;
+import java.awt.Graphics2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import javax.swing.JPanel;
 import javax.swing.plaf.basic.BasicComboBoxUI;
 
 /**
@@ -34,6 +36,10 @@ public class ExtractorForm extends javax.swing.JFrame {
     int minX = 500, minY = 500;
 
     int maxX = 0, maxY = 0;
+
+    int[][] minimizeMazeH;
+    int[][] minimizeMazeW;
+    int[][] minimizeMaze;
 
     Checkbox btnCheckDrawEmptyCell;
     Checkbox btnCheckDrawPill;
@@ -172,44 +178,52 @@ public class ExtractorForm extends javax.swing.JFrame {
             }
         }
 
-        this.setSize(margin * 2 + defaultWidth * scale, margin * 2 + defaultHeight * scale);
+        this.setSize(margin * 2 + defaultWidth * scale + 300, margin * 2 + defaultHeight * scale);
         System.out.println((margin * 2 + defaultWidth * scale) + " " + (margin * 2 + defaultHeight * scale));
-        paint(this.getGraphics());
 
-        int minimizeMazeH[][] = new int[defaultHeight + 1][defaultWidth + 1];
-        int minimizeMazeW[][] = new int[defaultHeight + 1][defaultWidth + 1];
-        int minimizeMaze[][] = new int[defaultHeight + 1][defaultWidth + 1];
+
+        minimizeMazeH = new int[defaultHeight + 1][defaultWidth + 1];
+        minimizeMazeW = new int[defaultHeight + 1][defaultWidth + 1];
+        minimizeMaze = new int[defaultHeight + 1][defaultWidth + 1];
 
         int index = 0;
-
+        for(int i =minX; i<=maxX; i++){
+            boolean f = false;
         for (int j = minY; j <= maxY; j++) {
-            if (maze[0][j] == 2) {
+            if (maze[i][j] == 2) {
 
-                for (int k = minX; k <= maxX; k++) {
-                    minimizeMazeW[k][index] = maze[k][j];
+                for (int k = minY; k <= maxY; k++) {
+                    minimizeMazeW[index][k] = maze[i][k];
                 }
 
                 index++;
+                f= true;
             }
+            if (f) break;
+        }
+        }
+         minimizeH = index;
+       
+        index = 0;
+        for (int j=minY; j <= maxY; j++){
+            boolean f = false;
+        for (int i = 0; i < minimizeH; i++) {
+            if (minimizeMazeW[i][j] == 2) {
+
+                for (int k = 0; k < minimizeH; k++) {
+                    minimizeMaze[k][index] = minimizeMazeW[k][j];
+                }
+
+                index++;
+                break;
+            }
+             if (f) break;
+        }
         }
 
         minimizeW = index;
-        index = 0;
-
-        for (int i = minX; i <= maxX; i++) {
-            if (maze[i][0] == 2) {
-
-                for (int k = minY; k <= maxY; k++) {
-                    minimizeMazeH[index][k] = maze[i][k];
-                }
-
-                index++;
-
-            }
-        }
-
-        minimizeH = index;
-
+        System.out.println(minimizeW + " " + minimizeH );
+                paint(this.getGraphics());
     }
 
     /**
@@ -254,29 +268,27 @@ public class ExtractorForm extends javax.swing.JFrame {
         g.drawRect(0, 0, margin * 2 + defaultWidth * scale - 1, margin * 2 + defaultHeight * scale - 1);
         g.setColor(Color.black);
 
-        g.fillRect(1, 1, margin * 2 + defaultWidth * scale - 2, margin * 2 + defaultHeight * scale - 2);
+        g.fillRect(1, 1, margin * 2 + defaultWidth * scale + 400, margin * 2 + defaultHeight * scale);
 
         for (int i = minX; i <= maxX; i++) {
             for (int j = minY; j <= maxY; j++) {
 
-                 if (btnCheckDrawEmptyCell.getState()) {
+                if (btnCheckDrawEmptyCell.getState()) {
                     g.setColor(Color.DARK_GRAY);
-                     g.fillRect(margin + j * scale + scale / 6, margin + i * scale + scale / 6, 2*scale/3 , 2* scale/3 );
-          
+                    g.fillRect(margin + j * scale + scale / 6, margin + i * scale + scale / 6, 2 * scale / 3, 2 * scale / 3);
+
                 }
-                 
-                 
+
                 if (maze[i][j] == 1 && btnCheckDrawPath.getState()) {
                     g.setColor(Color.blue);
-                }
-                else
-                if (maze[i][j] == 2 && btnCheckDrawPill.getState()) {
+                } else if (maze[i][j] == 2 && btnCheckDrawPill.getState()) {
                     g.setColor(Color.red);
+                } else {
+                    continue;
                 }
-                else continue;
-               
-                g.fillRect(margin + j * scale + scale / 6 , margin + i * scale + scale / 6,  2*scale/3 ,  2*scale/3 );
-           
+
+                g.fillRect(margin + j * scale + scale / 6, margin + i * scale + scale / 6, 2 * scale / 3, 2 * scale / 3);
+
             }
         }
 
@@ -286,7 +298,7 @@ public class ExtractorForm extends javax.swing.JFrame {
         int Y = game.getNodeYCood(game.getPacmanCurrentNodeIndex());
 
         if (btnCheckDrawPacman.getState()) {
-            g.fillOval(margin + X * scale - 4 * scale / 2, margin + Y * scale - 4 * scale / 2,4 * scale, 4* scale);
+            g.fillOval(margin + X * scale - 4 * scale / 2, margin + Y * scale - 4 * scale / 2, 4 * scale, 4 * scale);
         }
 
         Color[] listGhostColor = new Color[]{Color.PINK, Color.CYAN, Color.ORANGE, Color.RED};
@@ -301,6 +313,32 @@ public class ExtractorForm extends javax.swing.JFrame {
 
             }
         }
+
+        int marginMX = 800;
+        int marginMY = 50;
+
+        for (int i = 0; i < minimizeH; i++) {
+            for (int j = 0; j < minimizeW; j++) {
+
+                if (btnCheckDrawEmptyCell.getState()) {
+                    g.setColor(Color.DARK_GRAY);
+                    g.fillRect(marginMX + j * scale + scale / 6, marginMY + i * scale + scale / 6, 2 * scale / 3, 2 * scale / 3);
+
+                }
+
+                if (minimizeMaze[i][j] == 1 && btnCheckDrawPath.getState()) {
+                    g.setColor(Color.blue);
+                } else if (minimizeMaze[i][j] == 2 && btnCheckDrawPill.getState()) {
+                    g.setColor(Color.red);
+                } else {
+                    continue;
+                }
+
+                g.fillRect(marginMX + j * scale + scale / 6, marginMY + i * scale + scale / 6, 2 * scale / 3, 2 * scale / 3);
+
+            }
+        }
+
     }
 
     /**
@@ -333,8 +371,10 @@ public class ExtractorForm extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                Game game = new Game(0, 1);
+                for (int i=0; i <4; i++ ){
+                Game game = new Game(0,i);
                 new ExtractorForm(game).setVisible(true);
+                }
             }
         });
     }

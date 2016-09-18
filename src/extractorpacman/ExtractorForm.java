@@ -10,6 +10,8 @@ import java.awt.Graphics;
 import engine.pacman.game.Game;
 import engine.pacman.game.internal.Node;
 import java.awt.Checkbox;
+ 
+
 
 /**
  *
@@ -181,11 +183,11 @@ public class ExtractorForm extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 532, Short.MAX_VALUE)
+            .addGap(0, 748, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 564, Short.MAX_VALUE)
+            .addGap(0, 796, Short.MAX_VALUE)
         );
 
         pack();
@@ -193,8 +195,8 @@ public class ExtractorForm extends javax.swing.JFrame {
 
     public void paint(Graphics g) {
         g.setColor(Color.white);
-
-        g.drawRect(1, 1, margin * 2 + defaultWidth * scale - 2, margin * 2 + defaultHeight * scale - 2);
+         
+        g.drawRect(0,0,margin*2 + defaultWidth*scale-1, margin*2 + defaultHeight*scale-1);
         g.setColor(Color.black);
 
         g.fillRect(1, 1, margin * 2 + defaultWidth * scale - 2, margin * 2 + defaultHeight * scale - 2);
@@ -206,10 +208,9 @@ public class ExtractorForm extends javax.swing.JFrame {
            else  if (maze[i][j]==2  && btnCheckDrawPill.getState())
                     g.setColor(Color.red);
              else  if (  btnCheckDrawEmptyCell.getState())
-                    g.setColor(Color.DARK_GRAY);
-                }
-
-                g.fillRect(margin + j * scale - scale / 3, margin + i * scale - scale / 3, 2 * scale / 3, 2 * scale / 3);
+                 g.setColor(Color.DARK_GRAY);
+        
+              g.fillRect(margin + j*scale - scale/3 , margin + i*scale - scale/3, 2*scale/3, 2*scale/3);
             }
         }
         

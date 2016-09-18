@@ -17,7 +17,6 @@ import engine.pacman.game.Constants.MOVE;
 import engine.pacman.game.Game;
 import engine.pacman.game.internal.Node;
 
-
 /**
  *
  * @author giang-rocker
@@ -30,41 +29,144 @@ public class ExtractorForm extends javax.swing.JFrame {
     
     Game game ;
     int scale = 6;
-    int margin =50;
+    int margin = 50;
     int defaultWidth = 108;
     int defaultHeight = 116;
     int maze [][];
       int minX = 500, minY= 500 ;
-     
+
         int maxX = 0, maxY= 0 ;
+
+     Checkbox btnCheckDrawEmptyCell;
+     Checkbox btnCheckDrawPill;
+     Checkbox btnCheckDrawPath;
+     Checkbox btnCheckDrawGhost;
+     Checkbox btnCheckDrawPacman;
      
+     
+     public void initCheckBox (){
+         
+         int PosY = 20;
+         
+     btnCheckDrawEmptyCell = new Checkbox();
+     btnCheckDrawEmptyCell.setForeground(Color.white);
+     btnCheckDrawEmptyCell.setLabel("DrawEmptyCell");
+     btnCheckDrawEmptyCell.setLocation(10, PosY);
+     btnCheckDrawEmptyCell.setSize(130,30);
+     btnCheckDrawEmptyCell.setBackground(Color.black);
+     btnCheckDrawEmptyCell.setVisible(true);
+     
+     btnCheckDrawPill = new Checkbox();
+     btnCheckDrawPill.setForeground(Color.white);
+     btnCheckDrawPill.setLabel("DrawPill");
+     btnCheckDrawPill.setLocation(140, PosY);
+     btnCheckDrawPill.setSize(90,30);
+     btnCheckDrawPill.setBackground(Color.black);
+     btnCheckDrawPill.setVisible(true);
+     
+     btnCheckDrawPath = new Checkbox();
+     btnCheckDrawPath.setForeground(Color.white);
+     btnCheckDrawPath.setLabel("DrawPath");
+     btnCheckDrawPath.setLocation(230, PosY);
+     btnCheckDrawPath.setSize(90,30);
+     btnCheckDrawPath.setBackground(Color.black);
+     btnCheckDrawPath.setVisible(true);
+     
+     btnCheckDrawPacman = new Checkbox();
+     btnCheckDrawPacman.setForeground(Color.white);
+     btnCheckDrawPacman.setLabel("DrawPacMan");
+     btnCheckDrawPacman.setLocation(320, PosY);
+     btnCheckDrawPacman.setSize(120,30);
+     btnCheckDrawPacman.setBackground(Color.black);
+     btnCheckDrawPacman.setVisible(true);
+     
+     btnCheckDrawGhost = new Checkbox();
+     btnCheckDrawGhost.setForeground(Color.white);
+     btnCheckDrawGhost.setLabel("DrawGhosts");
+     btnCheckDrawGhost.setLocation(450, PosY);
+     btnCheckDrawGhost.setSize(120,30);
+     btnCheckDrawGhost.setBackground(Color.black);
+     btnCheckDrawGhost.setVisible(true);
+     
+      
+      
+     this.add(btnCheckDrawEmptyCell);
+     this.add(btnCheckDrawPill);
+     this.add(btnCheckDrawPath);
+     this.add(btnCheckDrawPacman);
+     this.add(btnCheckDrawGhost);
+     }
+     
+   
+        
     public ExtractorForm(Game _game) {
         initComponents();
+       initCheckBox();
         maze = new int [defaultHeight+1][defaultWidth+1];
-        
-       
-        
+
         this.game = _game;
-         for (Node node : game.getCurrentMaze().graph) {
-            
-         int nodeIndex = node.nodeIndex;
-       
-        int x = game.getNodeYCood(nodeIndex);
-        int y = game.getNodeXCood(nodeIndex);
-       
-         if (game.getPillIndex(nodeIndex)!=-1)
-        maze[x][y] = 2;
-         else 
-           maze[x][y] = 1;
-        
-        if (x<minX) minX = x;
-        if (y<minY) minY = y;
-         if (x>maxX) maxX = x;
-        if (y>maxY) maxY = y;
+        for (Node node : game.getCurrentMaze().graph) {
+
+            int nodeIndex = node.nodeIndex;
+
+            int x = game.getNodeYCood(nodeIndex);
+            int y = game.getNodeXCood(nodeIndex);
+
+            if (game.getPillIndex(nodeIndex) != -1) {
+                maze[x][y] = 2;
+            } else {
+                maze[x][y] = 1;
+            }
+
+            if (x < minX) {
+                minX = x;
+            }
+            if (y < minY) {
+                minY = y;
+            }
+            if (x > maxX) {
+                maxX = x;
+            }
+            if (y > maxY) {
+                maxY = y;
+            }
         }
-         
+
        this.setSize(margin*2 + defaultWidth*scale, margin*2 + defaultHeight*scale);
-       
+        System.out.println( (margin*2 + defaultWidth*scale) +" "+ (margin*2 + defaultHeight*scale));
+        paint(this.getGraphics());
+
+        int minimizeMazeH[][] = new int[defaultHeight + 1][defaultWidth + 1];
+        int minimizeMazeW[][] = new int[defaultHeight + 1][defaultWidth + 1];
+        int minimizeMaze[][] = new int[defaultHeight + 1][defaultWidth + 1];
+
+        int index = 0;
+        for (int i = minX; i <= maxX; i++) {
+            for (int j = minY; j <= maxY; j++) {
+                if (maze[i][j] != 2) {
+
+                    for (int k = minX; k <= maxX; k++) {
+                        minimizeMazeW[k][index++] = maze[k][j];
+                    }
+
+                }
+            }
+        }
+        minimizeW = index;
+        index = 0;
+        for (int j = minY; j <= maxY; j++) {
+            for (int i = minX; i <= maxX; i++) {
+                if (maze[i][j] != 2) {
+
+                    for (int k = minY; k <= maxY; k++) {
+                        minimizeMazeH[index++][k] = maze[i][k];
+                    }
+
+                }
+            }
+        }
+        minimizeH = index;
+
     }
 
     /**
@@ -94,51 +196,50 @@ public class ExtractorForm extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-    
-   
-    
-    
-    public void paint (Graphics g) {
+
+    public void paint(Graphics g) {
         g.setColor(Color.white);
-         
-        g.drawRect(1,1,margin*2 + defaultWidth*scale-2, margin*2 + defaultHeight*scale-2);
+
+        g.drawRect(1, 1, margin * 2 + defaultWidth * scale - 2, margin * 2 + defaultHeight * scale - 2);
         g.setColor(Color.black);
-         
-        g.fillRect(1,1,margin*2 + defaultWidth*scale-2, margin*2 + defaultHeight*scale-2);        
+
+        g.fillRect(1, 1, margin * 2 + defaultWidth * scale - 2, margin * 2 + defaultHeight * scale - 2);
         
         for (int i =minX; i <=maxX; i ++)
             for (int j =minY; j <=maxY; j ++){
-                if (maze [i][j]==1)
+                if (maze [i][j]==1 && btnCheckDrawPath.getState() )
                     g.setColor(Color.blue);
-           else  if (maze[i][j]==2)
+           else  if (maze[i][j]==2  && btnCheckDrawPill.getState())
                     g.setColor(Color.red);
-             else  
-                 g.setColor(Color.DARK_GRAY);
-        
-              g.fillRect(margin + j*scale - scale/3 , margin + i*scale - scale/3, 2*scale/3, 2*scale/3);
+             else  if (  btnCheckDrawEmptyCell.getState())
+                    g.setColor(Color.DARK_GRAY);
+                }
+
+                g.fillRect(margin + j * scale - scale / 3, margin + i * scale - scale / 3, 2 * scale / 3, 2 * scale / 3);
             }
+        }
         
         
+
         // draw Pacman
         g.setColor(Color.YELLOW);
         int X = game.getNodeXCood(game.getPacmanCurrentNodeIndex());
         int Y = game.getNodeYCood(game.getPacmanCurrentNodeIndex());
-        
+
         g.fillOval(margin + X*scale - 3*scale/2 , margin + Y*scale - 3*scale/2, 3*scale, 3*scale);
-        
+
         Color[] listGhostColor = new Color [] { Color.PINK,Color.CYAN, Color.ORANGE, Color.RED };    
         int index =0;
         for(GHOST ghost : GHOST.values()) {
-         X = game.getNodeXCood(game.getGhostCurrentNodeIndex(ghost));
-         Y = game.getNodeYCood(game.getGhostCurrentNodeIndex(ghost));
-         
-         g.setColor(listGhostColor[index++]);
+            X = game.getNodeXCood(game.getGhostCurrentNodeIndex(ghost));
+            Y = game.getNodeYCood(game.getGhostCurrentNodeIndex(ghost));
+
+            g.setColor(listGhostColor[index++]);
             g.fillOval(margin + X*scale - 3*scale/2 , margin + Y*scale - 3*scale/2, 3*scale, 3*scale);
-    
-        
+
         }
     }
-    
+
     /**
      * @param args the command line arguments
      */

@@ -5,17 +5,11 @@
  */
 package extractorpacman;
 
-import engine.pacman.game.Constants.GHOST;
 import java.awt.Color;
 import java.awt.Graphics;
-import static java.lang.Thread.sleep;
-import java.lang.reflect.Array;
-import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import engine.pacman.game.Constants.MOVE;
 import engine.pacman.game.Game;
 import engine.pacman.game.internal.Node;
+import java.awt.Checkbox;
 
 /**
  *

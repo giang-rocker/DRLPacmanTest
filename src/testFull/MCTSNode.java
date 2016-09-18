@@ -331,7 +331,7 @@ public class MCTSNode {
            
            
                 
-            if (rnd.nextInt(100) <10) {
+            if (rnd.nextInt(100) >30) {
              myMoves.put(ghost, game.getGhostLastMoveMade(ghost));
              continue;
             }

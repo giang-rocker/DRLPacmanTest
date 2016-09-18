@@ -112,6 +112,7 @@ public final class Game {
      */
     public Game(long seed) {
         this(seed, null);
+     
     }
 
     /**

@@ -152,7 +152,7 @@ public class MyPacMan extends PacmanController {
     public static void main(String[] args){
         Executor ex = new Executor(true, true);
         
-        ex.runGamePO(new MyPacMan(), new POCommGhosts(50), true);
+        ex.runGameTimedRecorded(new MyPacMan(), new POCommGhosts(50), true,"logGame.txt");
     //ex.runGame(new HumanController(new KeyBoardInput()), new POCommGhosts(50), true, 40);
     }
 }

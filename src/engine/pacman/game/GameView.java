@@ -205,13 +205,14 @@ public final class GameView extends JComponent {
      * Draw pills.
      */
     private void drawPills() {
-        int[] pillIndices = game.getPillIndices();
+         int[] pillIndices = game.getPillIndices();
 
         bufferGraphics.setColor(Color.white);
 
         for (int i = 0; i < pillIndices.length; i++)
             if (game.isPillStillAvailable(i))
                 bufferGraphics.fillOval(game.getNodeXCood(pillIndices[i]) * MAG + 4, game.getNodeYCood(pillIndices[i]) * MAG + 8, 3, 3);
+   
     }
 
     /**
@@ -312,7 +313,7 @@ public final class GameView extends JComponent {
         int pacmanLocation = game.getPacmanCurrentNodeIndex();
 //        overlay.fillRect(0, 0, GV_WIDTH * MAG, GV_HEIGHT * MAG);
 
-        overlay.setColor(Color.GRAY);
+        overlay.setColor(Color.black);
         for (int i = 0; i < game.getNumberOfNodes(); i++) {
             if (!pacmanGame.isNodeObservable(i)) {
                 overlay.fillRect(

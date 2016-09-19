@@ -62,6 +62,7 @@ public class ExtractorForm extends javax.swing.JFrame {
     Checkbox btnCheckDrawPacman;
     Button btnNextStage;
     
+    int mapMinimizeNode[][];
     
     int timeStep;
     
@@ -117,7 +118,7 @@ public class ExtractorForm extends javax.swing.JFrame {
         btnNextStage = new Button();
         btnNextStage.setForeground(Color.white);
         btnNextStage.setLabel("Next Stage");
-        btnNextStage.setLocation(670, PosY);
+        btnNextStage.setLocation(570, PosY);
         btnNextStage.setSize(120, 30);
         btnNextStage.setBackground(Color.black);
         btnNextStage.setVisible(true);
@@ -166,7 +167,7 @@ public class ExtractorForm extends javax.swing.JFrame {
  
 
     public ExtractorForm(Game _game) {
-        if(isNull(_game)) _game = new Game(0,3);
+        if(isNull(_game)) _game = new Game(0,1);
         initComponents();
         initControl();
         maze = new int[defaultHeight + 1][defaultWidth + 1];
@@ -180,7 +181,7 @@ public class ExtractorForm extends javax.swing.JFrame {
             int y = game.getNodeXCood(nodeIndex);
 
             if (game.getPillIndex(nodeIndex) != -1) {
-                maze[x][y] = game.getPillIndex(nodeIndex)+1;
+                maze[x][y] = nodeIndex+1;
             } else {
                 maze[x][y] = -1;
             }
@@ -262,6 +263,7 @@ public class ExtractorForm extends javax.swing.JFrame {
         this.game.setGameState(logFile.getNextStage());
          maze = new int[defaultHeight + 1][defaultWidth + 1];
 
+         mapMinimizeNode = new int[game.getNumberOfNodes()][2];
        
         for (Node node : game.getCurrentMaze().graph) {
 
@@ -271,7 +273,7 @@ public class ExtractorForm extends javax.swing.JFrame {
             int y = game.getNodeXCood(nodeIndex);
 
             if (game.getPillIndex(nodeIndex) != -1) {
-                maze[x][y] = game.getPillIndex(nodeIndex)+1;
+                maze[x][y] = nodeIndex+1;
             } else {
                 maze[x][y] = -1;
             }
@@ -325,7 +327,8 @@ public class ExtractorForm extends javax.swing.JFrame {
 
                     for (int k = 0; k < minimizeH; k++) {
                         minimizeMaze[k][index] = minimizeMazeW[k][j];
-                    }
+                        mapMinimizeNode[ minimizeMazeW[k][j]] = new int [] {k,index};
+                     }
 
                     index++;
                     break;
@@ -446,7 +449,7 @@ public class ExtractorForm extends javax.swing.JFrame {
                     g.fillRect(margin + j * scale + scale / 6, margin + i * scale + scale / 6, 2 * scale / 3, 2 * scale / 3);
 
                 }
-                if (maze[i][j] >0 && btnCheckDrawPill.getState() && this.game.isPillStillAvailable(maze[i][j]-1)) {
+                if (maze[i][j] >0 && btnCheckDrawPill.getState() && this.game.isPillStillAvailable( game.getPillIndex(maze[i][j]-1) )) {
                     g.setColor(Color.red);
                     g.fillRect(margin + j * scale + scale / 6, margin + i * scale + scale / 6, 2 * scale / 3, 2 * scale / 3);
 
@@ -464,8 +467,8 @@ public class ExtractorForm extends javax.swing.JFrame {
         if (btnCheckDrawPacman.getState()) {
             g.fillOval(margin + X * scale - 4 * scale / 2, margin + Y * scale - 4 * scale / 2, 4 * scale, 4 * scale);
         }
-        drawPacman () ;
-
+        
+       
         Color[] listGhostColor = new Color[]{Color.PINK, Color.CYAN, Color.GREEN, Color.RED};
         int index = 0;
         if (btnCheckDrawGhost.getState()) {
@@ -483,6 +486,7 @@ public class ExtractorForm extends javax.swing.JFrame {
             }
         }
 
+         //DRAW MINIMIZE MAP
         int marginMX = 800;
         int marginMY = 50;
 
@@ -505,7 +509,7 @@ public class ExtractorForm extends javax.swing.JFrame {
 
                 }
 
-                if (minimizeMaze[i][j] > 0 && btnCheckDrawPill.getState()&& this.game.isPillStillAvailable(minimizeMaze[i][j]-1)) {
+                if (minimizeMaze[i][j] > 0 && btnCheckDrawPill.getState()&& this.game.isPillStillAvailable( game.getPillIndex(minimizeMaze[i][j]-1))) {
                     g.setColor(Color.red);
                     g.fillRect(marginMX + j * scale + scale / 6, marginMY + i * scale + scale / 6, 2 * scale / 3, 2 * scale / 3);
 
@@ -513,6 +517,34 @@ public class ExtractorForm extends javax.swing.JFrame {
 
             }
         }
+        
+         // draw Pacman
+        g.setColor(Color.YELLOW);
+        X = game.getNodeXCood(game.getPacmanCurrentNodeIndex());
+        Y = game.getNodeYCood(game.getPacmanCurrentNodeIndex());
+
+        if (btnCheckDrawPacman.getState()) {
+            g.fillOval(margin + X * scale - 4 * scale / 2, margin + Y * scale - 4 * scale / 2, 4 * scale, 4 * scale);
+        }
+        
+       
+         index = 0;
+        if (btnCheckDrawGhost.getState()) {
+            for (GHOST ghost : GHOST.values()) {
+                X = game.getNodeXCood(game.getGhostCurrentNodeIndex(ghost));
+                 Y = game.getNodeYCood(game.getGhostCurrentNodeIndex(ghost));
+
+                g.setColor(listGhostColor[index++]);
+                
+                if (game.isGhostEdible(ghost))
+                    g.setColor(Color.blue);
+                
+                g.fillOval(margin + X * scale - 4 * scale / 2, margin + Y * scale - 4 * scale / 2, 4 * scale, 4 * scale);
+
+            }
+        }
+        
+        // END DRAW MINIMIZE MAP
 
     }
 
@@ -549,13 +581,13 @@ public class ExtractorForm extends javax.swing.JFrame {
 
                 ExtractorForm ex = new ExtractorForm(null);
                 
-                try {
-                    ex.init("F000000");
-                } catch (IOException ex1) {
-                    Logger.getLogger(ExtractorForm.class.getName()).log(Level.SEVERE, null, ex1);
-                }
+//                try {
+//                    ex.init("F000000");
+//                } catch (IOException ex1) {
+//                    Logger.getLogger(ExtractorForm.class.getName()).log(Level.SEVERE, null, ex1);
+//                }
                 ex.setVisible(true);
-                ex.autoNextStage();
+            //    ex.autoNextStage();
                 
             }
         });

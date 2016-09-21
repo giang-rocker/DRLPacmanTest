@@ -5,6 +5,7 @@
  */
 package extractorpacman;
 
+import engine.pacman.game.Constants;
 import engine.pacman.game.Constants.GHOST;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -42,13 +43,13 @@ public class ExtractorForm extends javax.swing.JFrame {
      */
     Game game;
     int scale = 6;
-    int margin = 50;
+    int margin = 70;
     int defaultWidth = 108;
     int defaultHeight = 116;
     int maze[][];
     int minimizeW, minimizeH;
     int minX = 500, minY = 500;
-    String fileName ;
+    String fileName;
     int maxX = 0, maxY = 0;
 
     int[][] minimizeMazeH;
@@ -61,11 +62,11 @@ public class ExtractorForm extends javax.swing.JFrame {
     Checkbox btnCheckDrawGhost;
     Checkbox btnCheckDrawPacman;
     Button btnNextStage;
-    
+
     int mapMinimizeNode[][];
-    
+
     int timeStep;
-    
+
     public void initControl() {
 
         int PosY = 10;
@@ -114,7 +115,7 @@ public class ExtractorForm extends javax.swing.JFrame {
         btnCheckDrawGhost.setBackground(Color.black);
         btnCheckDrawGhost.setVisible(true);
         btnCheckDrawGhost.setState(true);
-        
+
         btnNextStage = new Button();
         btnNextStage.setForeground(Color.white);
         btnNextStage.setLabel("Next Stage");
@@ -122,7 +123,7 @@ public class ExtractorForm extends javax.swing.JFrame {
         btnNextStage.setSize(120, 30);
         btnNextStage.setBackground(Color.black);
         btnNextStage.setVisible(true);
-       
+
         btnCheckDrawEmptyCell.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 chageState(evt);
@@ -148,12 +149,12 @@ public class ExtractorForm extends javax.swing.JFrame {
                 chageState(evt);
             }
         });
-        
+
         btnNextStage.addActionListener(new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-               clickNextStage(e);
-                
+                clickNextStage(e);
+
             }
         });
 
@@ -164,12 +165,16 @@ public class ExtractorForm extends javax.swing.JFrame {
         this.add(btnCheckDrawGhost);
         this.add(btnNextStage);
     }
- 
 
+    
+    int [] lastMiniPosition;
     public ExtractorForm(Game _game) {
-        if(isNull(_game)) _game = new Game(0,1);
+        if (isNull(_game)) {
+            _game = new Game(0, 1);
+        }
         initComponents();
         initControl();
+        lastMiniPosition = new int [5];
         maze = new int[defaultHeight + 1][defaultWidth + 1];
 
         this.game = _game;
@@ -181,7 +186,7 @@ public class ExtractorForm extends javax.swing.JFrame {
             int y = game.getNodeXCood(nodeIndex);
 
             if (game.getPillIndex(nodeIndex) != -1) {
-                maze[x][y] = nodeIndex+1;
+                maze[x][y] = nodeIndex + 1;
             } else {
                 maze[x][y] = -1;
             }
@@ -211,7 +216,7 @@ public class ExtractorForm extends javax.swing.JFrame {
         for (int i = minX; i <= maxX; i++) {
             boolean f = false;
             for (int j = minY; j <= maxY; j++) {
-                if (maze[i][j] >0) {
+                if (maze[i][j] > 0) {
 
                     for (int k = minY; k <= maxY; k++) {
                         minimizeMazeW[index][k] = maze[i][k];
@@ -231,7 +236,7 @@ public class ExtractorForm extends javax.swing.JFrame {
         for (int j = minY; j <= maxY; j++) {
             boolean f = false;
             for (int i = 0; i < minimizeH; i++) {
-                if (minimizeMazeW[i][j] >0) {
+                if (minimizeMazeW[i][j] > 0) {
 
                     for (int k = 0; k < minimizeH; k++) {
                         minimizeMaze[k][index] = minimizeMazeW[k][j];
@@ -250,21 +255,18 @@ public class ExtractorForm extends javax.swing.JFrame {
         System.out.println(minimizeW + " " + minimizeH);
         paint(this.getGraphics());
     }
-    
-    LogFile logFile ;
-    
-    public void init (String _fileName ) throws IOException {
+
+    LogFile logFile;
+
+    public void init(String _fileName) throws IOException {
         this.fileName = _fileName;
-        
+
         logFile = new LogFile();
         logFile.getLogFile(_fileName);
-        
-        
-        this.game.setGameState(logFile.getNextStage());
-         maze = new int[defaultHeight + 1][defaultWidth + 1];
 
-         mapMinimizeNode = new int[game.getNumberOfNodes()][2];
-       
+        this.game.setGameState(logFile.getNextStage());
+        maze = new int[defaultHeight + 1][defaultWidth + 1];
+
         for (Node node : game.getCurrentMaze().graph) {
 
             int nodeIndex = node.nodeIndex;
@@ -273,7 +275,7 @@ public class ExtractorForm extends javax.swing.JFrame {
             int y = game.getNodeXCood(nodeIndex);
 
             if (game.getPillIndex(nodeIndex) != -1) {
-                maze[x][y] = nodeIndex+1;
+                maze[x][y] = nodeIndex + 1;
             } else {
                 maze[x][y] = -1;
             }
@@ -298,12 +300,13 @@ public class ExtractorForm extends javax.swing.JFrame {
         minimizeMazeH = new int[defaultHeight + 1][defaultWidth + 1];
         minimizeMazeW = new int[defaultHeight + 1][defaultWidth + 1];
         minimizeMaze = new int[defaultHeight + 1][defaultWidth + 1];
+        mapMinimizeNode = new int[game.getNumberOfNodes()][2];
 
         int index = 0;
         for (int i = minX; i <= maxX; i++) {
             boolean f = false;
             for (int j = minY; j <= maxY; j++) {
-                if (maze[i][j] >0) {
+                if (maze[i][j] > 0) {
 
                     for (int k = minY; k <= maxY; k++) {
                         minimizeMazeW[index][k] = maze[i][k];
@@ -323,12 +326,14 @@ public class ExtractorForm extends javax.swing.JFrame {
         for (int j = minY; j <= maxY; j++) {
             boolean f = false;
             for (int i = 0; i < minimizeH; i++) {
-                if (minimizeMazeW[i][j] >0) {
+                if (minimizeMazeW[i][j] > 0) {
 
                     for (int k = 0; k < minimizeH; k++) {
                         minimizeMaze[k][index] = minimizeMazeW[k][j];
-                        mapMinimizeNode[ minimizeMazeW[k][j]] = new int [] {k,index};
-                     }
+                        if (minimizeMaze[k][index] >0) {
+                            mapMinimizeNode[minimizeMazeW[k][j]] = new int[]{k, index};
+                        }
+                    }
 
                     index++;
                     break;
@@ -342,9 +347,7 @@ public class ExtractorForm extends javax.swing.JFrame {
         minimizeW = index;
         System.out.println(minimizeW + " " + minimizeH);
         paint(this.getGraphics());
-        
-        
-    
+
     }
 
     /**
@@ -381,50 +384,44 @@ public class ExtractorForm extends javax.swing.JFrame {
     private void chageState(java.awt.event.ItemEvent evt) {
         // TODO add your handling code here:
         this.repaint();
-    } 
+    }
+
     private void clickNextStage(java.awt.event.ActionEvent evt) {
         // TODO add your handling code here:
-       String gameStage = logFile.getNextStage();
-        
-        if (!isNull(gameStage)){
-        game.setGameState(gameStage);
-        this.repaint();
-        }
-    }
-   
-    
-    public void autoNextStage() {
-       
         String gameStage = logFile.getNextStage();
-        
-        while (!isNull(gameStage) && gameStage !=""){
-        game.setGameState(gameStage);
-         
-        try {
-            sleep(20);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(ExtractorForm.class.getName()).log(Level.SEVERE, null, ex);
+
+        if (!isNull(gameStage)) {
+            game.setGameState(gameStage);
+            this.repaint();
         }
-        
-         gameStage = logFile.getNextStage();
-         
-         this.paint(this.getGraphics());
-         
+    }
+
+    public void autoNextStage() {
+
+        String gameStage = logFile.getNextStage();
+
+        while (!isNull(gameStage) && gameStage != "") {
+            game.setGameState(gameStage);
+
+            try {
+                sleep(20);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(ExtractorForm.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+            gameStage = logFile.getNextStage();
+
+            this.paint(this.getGraphics());
+
         }
-        
-        
+
     }
-    
-    public void drawPacman () {
-       
-         
-        
-    
+
+    public void drawPacman() {
+
     }
-    
     public void paint(Graphics g) {
-       
-               
+
         g.setColor(Color.black);
         g.fillRect(0, 0, margin * 2 + defaultWidth * scale + 400, margin * 2 + defaultHeight * scale);
         g.setColor(Color.white);
@@ -436,7 +433,7 @@ public class ExtractorForm extends javax.swing.JFrame {
 
                 if (btnCheckDrawEmptyCell.getState()) {
                     g.setColor(Color.DARK_GRAY);
-                    g.fillRect(margin + j * scale + scale / 6, margin + i * scale + scale / 6, 2 * scale / 3, 2 * scale / 3);
+                    g.fillRect(margin + j * scale - scale / 3, margin + i * scale - scale / 3, 2 * scale / 3, 2 * scale / 3);
 
                 }
 
@@ -446,47 +443,70 @@ public class ExtractorForm extends javax.swing.JFrame {
 
                 if (btnCheckDrawPath.getState()) {
                     g.setColor(Color.blue);
-                    g.fillRect(margin + j * scale + scale / 6, margin + i * scale + scale / 6, 2 * scale / 3, 2 * scale / 3);
+                    g.fillRect(margin + j * scale - scale / 3, margin + i * scale - scale / 3, 2 * scale / 3, 2 * scale / 3);
 
                 }
-                if (maze[i][j] >0 && btnCheckDrawPill.getState() && this.game.isPillStillAvailable( game.getPillIndex(maze[i][j]-1) )) {
+                if (maze[i][j] > 0 && btnCheckDrawPill.getState() && this.game.isPillStillAvailable(game.getPillIndex(maze[i][j] - 1))) {
                     g.setColor(Color.red);
-                    g.fillRect(margin + j * scale + scale / 6, margin + i * scale + scale / 6, 2 * scale / 3, 2 * scale / 3);
+                    g.fillRect(margin + j * scale - scale / 3, margin + i * scale - scale / 3, 2 * scale / 3, 2 * scale / 3);
 
                 }
 
-            
             }
         }
 
         // draw Pacman
-        g.setColor(Color.YELLOW);
         int X = game.getNodeXCood(game.getPacmanCurrentNodeIndex());
         int Y = game.getNodeYCood(game.getPacmanCurrentNodeIndex());
 
         if (btnCheckDrawPacman.getState()) {
-            g.fillOval(margin + X * scale - 4 * scale / 2, margin + Y * scale - 4 * scale / 2, 4 * scale, 4 * scale);
+
+            g.setColor(Color.YELLOW);
+            g.fillRect(margin + X * scale - 3 * scale / 2, margin + Y * scale - 3 * scale / 2, 3 * scale, 3 * scale);
+            int deltaX =0, detalY = 0;
+              switch (game.getPacmanLastMoveMade()) {
+                    case DOWN : { deltaX=0; detalY=1  ; break;}
+                    case UP : { deltaX=0; detalY=-1  ; break;}
+                    case LEFT : { deltaX=-1; detalY=0  ; break;}
+                    case RIGHT : { deltaX=1; detalY=0  ; break;}
+                
+                }
+            
+            g.setColor(Color.black);
+              g.fillRect(margin + (X+deltaX) * scale - scale / 2, margin + (Y+detalY) * scale - scale / 2, scale, scale);
         }
-        
-       
-        Color[] listGhostColor = new Color[]{Color.PINK, Color.CYAN, Color.GREEN, Color.RED};
+
+        Color[] listGhostColor = new Color[]{Color.white, Color.CYAN, Color.GREEN, Color.PINK};
         int index = 0;
         if (btnCheckDrawGhost.getState()) {
             for (GHOST ghost : GHOST.values()) {
                 X = game.getNodeXCood(game.getGhostCurrentNodeIndex(ghost));
-                 Y = game.getNodeYCood(game.getGhostCurrentNodeIndex(ghost));
-
+                Y = game.getNodeYCood(game.getGhostCurrentNodeIndex(ghost));
+                
+                int deltaX =0, detalY = 0;
+                
+                switch (game.getGhostLastMoveMade(ghost)) {
+                    case DOWN : { deltaX=0; detalY=1  ; break;}
+                    case UP : { deltaX=0; detalY=-1  ; break;}
+                    case LEFT : { deltaX=-1; detalY=0  ; break;}
+                    case RIGHT : { deltaX=1; detalY=0  ; break;}
+                
+                }
+                
                 g.setColor(listGhostColor[index++]);
-                
-                if (game.isGhostEdible(ghost))
-                    g.setColor(Color.blue);
-                
-                g.fillOval(margin + X * scale - 4 * scale / 2, margin + Y * scale - 4 * scale / 2, 4 * scale, 4 * scale);
+
+                if (game.isGhostEdible(ghost)) {
+                    g.setColor(Color.gray);
+                }
+
+                g.fillOval(margin + X * scale - 3 * scale / 2, margin + Y * scale - 3 * scale / 2, 3 * scale, 3 * scale);
+                 g.setColor(Color.black);
+                g.fillRect(margin + (X+deltaX) * scale - scale / 2, margin + (Y+detalY) * scale - scale / 2, scale, scale);
 
             }
         }
 
-         //DRAW MINIMIZE MAP
+        //DRAW MINIMIZE MAP
         int marginMX = 800;
         int marginMY = 50;
 
@@ -495,7 +515,7 @@ public class ExtractorForm extends javax.swing.JFrame {
 
                 if (btnCheckDrawEmptyCell.getState()) {
                     g.setColor(Color.DARK_GRAY);
-                    g.fillRect(marginMX + j * scale + scale / 6, marginMY + i * scale + scale / 6, 2 * scale / 3, 2 * scale / 3);
+                    g.fillRect(marginMX + j * scale - scale / 3, marginMY + i * scale - scale / 3, 2 * scale / 3, 2 * scale / 3);
 
                 }
 
@@ -505,47 +525,55 @@ public class ExtractorForm extends javax.swing.JFrame {
 
                 if (btnCheckDrawPath.getState()) {
                     g.setColor(Color.blue);
-                    g.fillRect(marginMX + j * scale + scale / 6, marginMY + i * scale + scale / 6, 2 * scale / 3, 2 * scale / 3);
+                    g.fillRect(marginMX + j * scale - scale / 3, marginMY + i * scale - scale / 3, 2 * scale / 3, 2 * scale / 3);
 
                 }
 
-                if (minimizeMaze[i][j] > 0 && btnCheckDrawPill.getState()&& this.game.isPillStillAvailable( game.getPillIndex(minimizeMaze[i][j]-1))) {
+                if (minimizeMaze[i][j] > 0 && btnCheckDrawPill.getState() && this.game.isPillStillAvailable(game.getPillIndex(minimizeMaze[i][j] - 1))) {
                     g.setColor(Color.red);
-                    g.fillRect(marginMX + j * scale + scale / 6, marginMY + i * scale + scale / 6, 2 * scale / 3, 2 * scale / 3);
+                    g.fillRect(marginMX + j * scale - scale / 3, marginMY + i * scale - scale / 3, 2 * scale / 3, 2 * scale / 3);
 
                 }
 
             }
         }
-        
-         // draw Pacman
-        g.setColor(Color.YELLOW);
-        X = game.getNodeXCood(game.getPacmanCurrentNodeIndex());
-        Y = game.getNodeYCood(game.getPacmanCurrentNodeIndex());
 
+        // draw Pacman
+          
+        if (!isNull(mapMinimizeNode)){
+        if ( mapMinimizeNode[game.getPacmanCurrentNodeIndex()+1][0]!=0 ) lastMiniPosition[0] = game.getPacmanCurrentNodeIndex()+1;
         if (btnCheckDrawPacman.getState()) {
-            g.fillOval(margin + X * scale - 4 * scale / 2, margin + Y * scale - 4 * scale / 2, 4 * scale, 4 * scale);
+             Y = mapMinimizeNode[lastMiniPosition[0] ][0];
+             X = mapMinimizeNode[lastMiniPosition[0] ][1];
+
+            g.setColor(Color.YELLOW);
+            g.fillRect(marginMX + X * scale - scale / 2, marginMY + Y * scale - scale / 2, scale, scale);
         }
-        
-       
-         index = 0;
+
+        index = 0;
+      
         if (btnCheckDrawGhost.getState()) {
-            for (GHOST ghost : GHOST.values()) {
-                X = game.getNodeXCood(game.getGhostCurrentNodeIndex(ghost));
-                 Y = game.getNodeYCood(game.getGhostCurrentNodeIndex(ghost));
+         for (GHOST ghost : GHOST.values()) {
+             if( game.getGhostCurrentNodeIndex(ghost)!=game.getCurrentMaze().lairNodeIndex ) {
+             if ( mapMinimizeNode[game.getGhostCurrentNodeIndex(ghost)+1][0]!=0 )  lastMiniPosition[index+1] = game.getGhostCurrentNodeIndex(ghost)+1;
+                 
+             Y = mapMinimizeNode[lastMiniPosition[index+1]][0];
+             X = mapMinimizeNode[lastMiniPosition[index+1]][1];
+                g.setColor(listGhostColor[index]);
 
-                g.setColor(listGhostColor[index++]);
-                
-                if (game.isGhostEdible(ghost))
-                    g.setColor(Color.blue);
-                
-                g.fillOval(margin + X * scale - 4 * scale / 2, margin + Y * scale - 4 * scale / 2, 4 * scale, 4 * scale);
-
+                if (game.isGhostEdible(ghost)) {
+                    g.setColor(Color.gray);
+                }
+                    g.fillRect(marginMX + X * scale - scale / 2, marginMY + Y * scale - scale / 2, scale, scale);
+       
+             }
+             
+             index++;
             }
+        }
         }
         
         // END DRAW MINIMIZE MAP
-
     }
 
     /**
@@ -580,15 +608,15 @@ public class ExtractorForm extends javax.swing.JFrame {
             public void run() {
 
                 ExtractorForm ex = new ExtractorForm(null);
-                
-//                try {
-//                    ex.init("F000000");
-//                } catch (IOException ex1) {
-//                    Logger.getLogger(ExtractorForm.class.getName()).log(Level.SEVERE, null, ex1);
-//                }
+
+                try {
+                    ex.init("F000000");
+                } catch (IOException ex1) {
+                    Logger.getLogger(ExtractorForm.class.getName()).log(Level.SEVERE, null, ex1);
+                }
                 ex.setVisible(true);
-            //    ex.autoNextStage();
-                
+                //    ex.autoNextStage();
+
             }
         });
     }

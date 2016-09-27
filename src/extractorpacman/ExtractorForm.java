@@ -47,7 +47,7 @@ public class ExtractorForm extends javax.swing.JFrame {
     int defaultWidth = 108;
     int defaultHeight = 116;
     int maze[][];
-    int minimizeW, minimizeH;
+    int minimizeW=28, minimizeH=30;
     int minX = 500, minY = 500;
     String fileName;
     int maxX = 0, maxY = 0;
@@ -178,6 +178,11 @@ public class ExtractorForm extends javax.swing.JFrame {
         maze = new int[defaultHeight + 1][defaultWidth + 1];
 
         this.game = _game;
+        
+        for (int i =0; i <=defaultHeight; i ++ )
+            for (int j =0; j <=defaultWidth; j++ )
+                maze[i][j] = -1;
+        
         for (Node node : game.getCurrentMaze().graph) {
 
             int nodeIndex = node.nodeIndex;
@@ -185,11 +190,9 @@ public class ExtractorForm extends javax.swing.JFrame {
             int x = game.getNodeYCood(nodeIndex);
             int y = game.getNodeXCood(nodeIndex);
 
-            if (game.getPillIndex(nodeIndex) != -1) {
+          
                 maze[x][y] = nodeIndex + 1;
-            } else {
-                maze[x][y] = -1;
-            }
+           
 
             if (x < minX) {
                 minX = x;
@@ -208,50 +211,25 @@ public class ExtractorForm extends javax.swing.JFrame {
         this.setSize(margin * 2 + defaultWidth * scale + 300, margin * 2 + defaultHeight * scale);
         System.out.println((margin * 2 + defaultWidth * scale) + " " + (margin * 2 + defaultHeight * scale));
 
-        minimizeMazeH = new int[defaultHeight + 1][defaultWidth + 1];
-        minimizeMazeW = new int[defaultHeight + 1][defaultWidth + 1];
-        minimizeMaze = new int[defaultHeight + 1][defaultWidth + 1];
-
-        int index = 0;
-        for (int i = minX; i <= maxX; i++) {
-            boolean f = false;
-            for (int j = minY; j <= maxY; j++) {
-                if (maze[i][j] > 0) {
-
-                    for (int k = minY; k <= maxY; k++) {
-                        minimizeMazeW[index][k] = maze[i][k];
-                    }
-
-                    index++;
-                    f = true;
-                }
-                if (f) {
-                    break;
-                }
+        
+         minimizeMaze = new int[minimizeH+1][minimizeW+1];
+        mapMinimizeNode = new int[game.getNumberOfNodes()+1][2];
+        int indexX=0, indexY = 0;
+        
+        for(int i = minX; i <= maxX; i+=4){
+            for(int j =minY; j <= maxY; j+=4){
+                
+                if(maze[i][j]>0)
+                mapMinimizeNode[maze[i][j]] = new int[] {i/4,j/4};
+                 
+                minimizeMaze[i/4][j/4] = maze[i][j];
+                
+                
+                
             }
+        
         }
-        minimizeH = index;
-
-        index = 0;
-        for (int j = minY; j <= maxY; j++) {
-            boolean f = false;
-            for (int i = 0; i < minimizeH; i++) {
-                if (minimizeMazeW[i][j] > 0) {
-
-                    for (int k = 0; k < minimizeH; k++) {
-                        minimizeMaze[k][index] = minimizeMazeW[k][j];
-                    }
-
-                    index++;
-                    break;
-                }
-                if (f) {
-                    break;
-                }
-            }
-        }
-
-        minimizeW = index;
+        
         System.out.println(minimizeW + " " + minimizeH);
         paint(this.getGraphics());
     }
@@ -266,7 +244,11 @@ public class ExtractorForm extends javax.swing.JFrame {
 
         this.game.setGameState(logFile.getNextStage());
         maze = new int[defaultHeight + 1][defaultWidth + 1];
-
+        
+        for (int i =0; i <=defaultHeight; i ++ )
+            for (int j =0; j <=defaultWidth; j++ )
+                maze[i][j] = -1;
+        
         for (Node node : game.getCurrentMaze().graph) {
 
             int nodeIndex = node.nodeIndex;
@@ -274,12 +256,9 @@ public class ExtractorForm extends javax.swing.JFrame {
             int x = game.getNodeYCood(nodeIndex);
             int y = game.getNodeXCood(nodeIndex);
 
-            if (game.getPillIndex(nodeIndex) != -1) {
+           
                 maze[x][y] = nodeIndex + 1;
-            } else {
-                maze[x][y] = -1;
-            }
-
+           
             if (x < minX) {
                 minX = x;
             }
@@ -297,55 +276,26 @@ public class ExtractorForm extends javax.swing.JFrame {
         this.setSize(margin * 2 + defaultWidth * scale + 300, margin * 2 + defaultHeight * scale);
         System.out.println((margin * 2 + defaultWidth * scale) + " " + (margin * 2 + defaultHeight * scale));
 
-        minimizeMazeH = new int[defaultHeight + 1][defaultWidth + 1];
-        minimizeMazeW = new int[defaultHeight + 1][defaultWidth + 1];
-        minimizeMaze = new int[defaultHeight + 1][defaultWidth + 1];
-        mapMinimizeNode = new int[game.getNumberOfNodes()][2];
-
-        int index = 0;
-        for (int i = minX; i <= maxX; i++) {
-            boolean f = false;
-            for (int j = minY; j <= maxY; j++) {
-                if (maze[i][j] > 0) {
-
-                    for (int k = minY; k <= maxY; k++) {
-                        minimizeMazeW[index][k] = maze[i][k];
-                    }
-
-                    index++;
-                    f = true;
-                }
-                if (f) {
-                    break;
-                }
+       minimizeMaze = new int[minimizeH+1][minimizeW+1];
+         mapMinimizeNode = new int[game.getNumberOfNodes()+1][2];
+        
+        int indexX=0, indexY = 0;
+        
+         for(int i = minX; i <= maxX; i+=4){
+            for(int j =minY; j <= maxY; j+=4){
+                
+                if(maze[i][j]>0)
+                mapMinimizeNode[maze[i][j]] = new int[] {i/4,j/4};
+                 
+                minimizeMaze[i/4][j/4] = maze[i][j];
             }
-        }
-        minimizeH = index;
-
-        index = 0;
-        for (int j = minY; j <= maxY; j++) {
-            boolean f = false;
-            for (int i = 0; i < minimizeH; i++) {
-                if (minimizeMazeW[i][j] > 0) {
-
-                    for (int k = 0; k < minimizeH; k++) {
-                        minimizeMaze[k][index] = minimizeMazeW[k][j];
-                        if (minimizeMaze[k][index] >0) {
-                            mapMinimizeNode[minimizeMazeW[k][j]] = new int[]{k, index};
-                        }
-                    }
-
-                    index++;
-                    break;
-                }
-                if (f) {
-                    break;
-                }
-            }
+       
         }
 
-        minimizeW = index;
+     
+        
         System.out.println(minimizeW + " " + minimizeH);
+        System.out.println(minX + " " + minY + " " + maxX + " " + maxY);
         paint(this.getGraphics());
 
     }
@@ -437,7 +387,7 @@ public class ExtractorForm extends javax.swing.JFrame {
 
                 }
 
-                if (maze[i][j] == 0) {
+                if (maze[i][j] == -1) {
                     continue;
                 }
 
@@ -446,7 +396,9 @@ public class ExtractorForm extends javax.swing.JFrame {
                     g.fillRect(margin + j * scale - scale / 3, margin + i * scale - scale / 3, 2 * scale / 3, 2 * scale / 3);
 
                 }
-                if (maze[i][j] > 0 && btnCheckDrawPill.getState() && this.game.isPillStillAvailable(game.getPillIndex(maze[i][j] - 1))) {
+                if(maze[i][j] > 0)
+                if(game.getPillIndex(maze[i][j] - 1) >0 )    
+                if (   btnCheckDrawPill.getState() && this.game.isPillStillAvailable(game.getPillIndex(maze[i][j] - 1))) {
                     g.setColor(Color.red);
                     g.fillRect(margin + j * scale - scale / 3, margin + i * scale - scale / 3, 2 * scale / 3, 2 * scale / 3);
 
@@ -510,7 +462,7 @@ public class ExtractorForm extends javax.swing.JFrame {
         int marginMX = 800;
         int marginMY = 50;
 
-        for (int i = 0; i < minimizeH; i++) {
+        for (int i = 1; i < minimizeH; i++) {
             for (int j = 0; j < minimizeW; j++) {
 
                 if (btnCheckDrawEmptyCell.getState()) {
@@ -519,7 +471,7 @@ public class ExtractorForm extends javax.swing.JFrame {
 
                 }
 
-                if (minimizeMaze[i][j] == 0) {
+                if (minimizeMaze[i][j] == -1) {
                     continue;
                 }
 
@@ -529,7 +481,9 @@ public class ExtractorForm extends javax.swing.JFrame {
 
                 }
 
-                if (minimizeMaze[i][j] > 0 && btnCheckDrawPill.getState() && this.game.isPillStillAvailable(game.getPillIndex(minimizeMaze[i][j] - 1))) {
+                if (minimizeMaze[i][j] > 0)
+                if(game.getPillIndex(minimizeMaze[i][j] - 1) >0)
+                if( btnCheckDrawPill.getState() && this.game.isPillStillAvailable(game.getPillIndex(minimizeMaze[i][j] - 1))) {
                     g.setColor(Color.red);
                     g.fillRect(marginMX + j * scale - scale / 3, marginMY + i * scale - scale / 3, 2 * scale / 3, 2 * scale / 3);
 

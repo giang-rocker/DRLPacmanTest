@@ -111,6 +111,8 @@ public class ExtractorForm extends javax.swing.JFrame {
     int mapMinimizeNode[][];
 
     int timeStep;
+    
+    FrameDisplay FD ;
 
     public void initControl() {
 
@@ -277,6 +279,8 @@ public class ExtractorForm extends javax.swing.JFrame {
         
         System.out.println(minimizeW + " " + minimizeH);
         paint(this.getGraphics());
+        
+       
     }
 
     LogFile logFile;
@@ -342,6 +346,13 @@ public class ExtractorForm extends javax.swing.JFrame {
         System.out.println(minimizeW + " " + minimizeH);
         System.out.println(minX + " " + minY + " " + maxX + " " + maxY);
         paint(this.getGraphics());
+        
+         //set up frame display
+        FD = new FrameDisplay();
+        FD.setVisible(true);
+        FD.extractorData.loadGameFromGameState(logFile.getCurrentState()  );
+        FD.collectArray();
+        FD.repaint();
 
     }
 
@@ -384,8 +395,13 @@ public class ExtractorForm extends javax.swing.JFrame {
     private void clickNextStage(java.awt.event.ActionEvent evt) {
         // TODO add your handling code here:
         String gameStage = logFile.getNextStage();
+       FD.extractorData = new ExtractorData();
+       FD.extractorData.loadGameFromGameState(gameStage  );
+       FD.collectArray();
+       FD.repaint();
+       FD.validate();
 
-        if (!isNull(gameStage)) {
+          if (!isNull(gameStage)) {
             game.setGameState(gameStage);
             this.repaint();
         }
@@ -412,9 +428,7 @@ public class ExtractorForm extends javax.swing.JFrame {
 
     }
 
-    public void drawPacman() {
-
-    }
+     
     public void paint(Graphics g) {
 
         g.setColor(Color.black);
@@ -579,7 +593,45 @@ public class ExtractorForm extends javax.swing.JFrame {
      * @param args the command line arguments
      */
    
-
+ public static void main(String args[]) {
+         /* Set the Nimbus look and feel */
+         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+          * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+          */
+         try {
+             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                 if ("Nimbus".equals(info.getName())) {
+                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                     break;
+                 }
+             }
+         } catch (ClassNotFoundException ex) {
+             java.util.logging.Logger.getLogger(ExtractorForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+         } catch (InstantiationException ex) {
+             java.util.logging.Logger.getLogger(ExtractorForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+         } catch (IllegalAccessException ex) {
+             java.util.logging.Logger.getLogger(ExtractorForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+             java.util.logging.Logger.getLogger(ExtractorForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+         }
+         //</editor-fold>
+ 
+         /* Create and display the form */
+         java.awt.EventQueue.invokeLater(new Runnable() {
+             public void run() {
+  
+               ExtractorForm EF = new ExtractorForm(null);
+                 try {
+                     EF.init("F000000");
+                 } catch (IOException ex) {
+                     Logger.getLogger(ExtractorForm.class.getName()).log(Level.SEVERE, null, ex);
+                 }
+                 EF.setVisible(true);
+                  
+              }
+          });
+     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox jCheckBox1;

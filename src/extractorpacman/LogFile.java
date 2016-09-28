@@ -57,4 +57,9 @@ public class LogFile {
         if (currentTimeStep < numOfStage) return gameStage[currentTimeStep++];
         else return null;
     }
+    
+     public String getCurrentState () {
+        if (currentTimeStep < numOfStage) return gameStage[currentTimeStep];
+        else return null;
+    }
 }

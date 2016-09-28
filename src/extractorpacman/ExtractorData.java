@@ -12,6 +12,7 @@ import static engine.pacman.game.Constants.MOVE.*;
 import engine.pacman.game.Game;
 import java.io.IOException;
 import java.util.Arrays;
+import static java.util.Objects.isNull;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -68,13 +69,11 @@ public class ExtractorData {
     int defaultX = 30;
     int defaultY = 28;
 
-    public void loadGameFromFile(String _fileName) throws IOException {
-        this.fileName = _fileName;
-
-        logFile = new LogFile();
-        logFile.getLogFile(_fileName);
-
-        this.game.setGameState(logFile.getNextStage()); // first gameStage
+    public void loadGameFromGameState(String gameState)   {
+        
+       this.game = new Game(0,0);
+        this.game.setGameState(gameState); // first gameStage
+         this.extractData();
     }
 
     public ExtractorData(){
@@ -82,6 +81,7 @@ public class ExtractorData {
     }
     public void _init() {
         
+        if(isNull(this.game))
         this.game = new Game(0,0);
         
         frameMiniMap = new int[defaultX][defaultY];
@@ -172,12 +172,14 @@ public class ExtractorData {
             int y = game.getNodeXCood(i) / 4;
 
             frameMiniMap[x][y] = 1;
-
-            if (game.getPillIndex(i) != -1) {
+            
+            if(game.getPillIndex(i)!=-1)
+            if ( game.isPillStillAvailable(game.getPillIndex(i))) {
                 framePill[x][y] = 1;
             }
-
-            if (game.getPowerPillIndex(i) != -1) {
+            
+            if(game.getPowerPillIndex(i)!=-1)
+            if (game.isPowerPillStillAvailable(game.getPowerPillIndex(i))) {
                 framePowerPill[x][y] = 1;
             }
 
@@ -187,7 +189,8 @@ public class ExtractorData {
         {
             int x = game.getNodeYCood(game.getPacmanCurrentNodeIndex()) / 4;
             int y = game.getNodeXCood(game.getPacmanCurrentNodeIndex()) / 4;
-
+            
+            System.out.println(x +"- " + y);
             framePacmanPosition[x][y] = 1;
 
             // SETUP PACMAN LEFT RIGHT UP DOWN
@@ -304,17 +307,5 @@ public class ExtractorData {
         }
 
     }
-
-    public static void main(String args[]) throws IOException {
-        String fileName = "F000000";
-
-        ExtractorData ED = new ExtractorData();
-        ED.loadGameFromFile(fileName);
-        ED.extractData();
-        
-        for (int i =0; i < ED.defaultX; i++)
-        System.out.println(Arrays.toString(ED.frameMiniMap[i]));
-        
-    }
-
+ 
 }

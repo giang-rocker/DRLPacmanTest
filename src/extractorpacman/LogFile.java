@@ -43,7 +43,7 @@ public class LogFile {
         while (scanner.hasNextLine()) {
             input = scanner.nextLine();
             gameStage[index++] = input;
-    
+            
         }
         
         numOfStage = index;

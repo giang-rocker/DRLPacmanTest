@@ -55,6 +55,51 @@ public class ExtractorForm extends javax.swing.JFrame {
     int[][] minimizeMazeH;
     int[][] minimizeMazeW;
     int[][] minimizeMaze;
+    
+    // 26x29 : shape of maze
+    int frameMiniMap[][];
+    
+    // noPill: 0; pill:1
+    int framePill[][];
+    int framePowerPill[][];
+    
+    // no Pacman: 0, Pacman: 1
+    int framePacmanLeft[][];
+    int framePacmanRight[][];
+    int framePacmanUp[][];
+    int framePacmanDown[][];
+    int framePacmanHorizontal0[][];
+    int framePacmanHorizontal1[][];
+    int framePacmanHorizontal2[][];
+    int framePacmanHorizontal3[][];
+    int framePacmanVerhicel0[][];
+    int framePacmanVerhicel1[][];
+    int framePacmanVerhicel2[][];
+    int framePacmanVerhicel3[][];
+    
+    // noGhost: 0 , nomal ghost: 1 || eldibleGhost: -1
+    int frameGhostLeft[][];
+    int frameGhostRight[][];
+    int frameGhostUp[][];
+    int frameGhostDown[][];
+    int frameGhostHorizontal0[][];
+    int frameGhostHorizontal1[][];
+    int frameGhostHorizontal2[][];
+    int frameGhostHorizontal3[][];
+    int frameGhostVerhicel0[][];
+    int frameGhostVerhicel1[][];
+    int frameGhostVerhicel2[][];
+    int frameGhostVerhicel3[][];
+    
+    int frameTime[][];
+    int frameLevel[][];
+    int frameLiveLeft[][];
+    
+    // eldible Time; ??
+    
+    
+    
+    
 
     Checkbox btnCheckDrawEmptyCell;
     Checkbox btnCheckDrawPill;
@@ -533,47 +578,7 @@ public class ExtractorForm extends javax.swing.JFrame {
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(ExtractorForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(ExtractorForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(ExtractorForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(ExtractorForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-
-                ExtractorForm ex = new ExtractorForm(null);
-
-                try {
-                    ex.init("F000000");
-                } catch (IOException ex1) {
-                    Logger.getLogger(ExtractorForm.class.getName()).log(Level.SEVERE, null, ex1);
-                }
-                ex.setVisible(true);
-                //    ex.autoNextStage();
-
-            }
-        });
-    }
+   
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

@@ -36,7 +36,7 @@ public final class GameView extends JComponent {
     private static boolean isVisible = true;
     private static boolean saveImage = false;
     private static String imageFileName = "";
-    private final Game game;
+    public  Game game;
     private Images images;
     private MOVE lastPacManMove;
     private int time;
@@ -430,6 +430,12 @@ public final class GameView extends JComponent {
         } catch (Exception e) {
         }
 
+        return this;
+    }
+    
+    public GameView showGameX() {
+        this.frame = new GameFrame(this);
+ 
         return this;
     }
 

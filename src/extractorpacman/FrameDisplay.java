@@ -26,15 +26,16 @@ public class FrameDisplay extends javax.swing.JFrame {
     ExtractorData extractorData;
     int collectedArray[][][];
 
-    int numOfArray = 32;
+    int numOfArray = 29;
     int defaultX = 30;
     int defaultY = 28;
-    int marginMX = 100;
+    int marginMX = 25;
     int marginMY = 100;
     int scale = 10;
 
     // controll
     Button btnNextFrame;
+     Button btnPrevFrame;
     Label lbFrameName;
 
     //list Frame Name
@@ -44,11 +45,19 @@ public class FrameDisplay extends javax.swing.JFrame {
         //CONFIG CONTROLL
         btnNextFrame = new Button();
         btnNextFrame.setForeground(Color.white);
-        btnNextFrame.setLabel("Next Frame");
-        btnNextFrame.setLocation(30, 30);
-        btnNextFrame.setSize(120, 30);
+        btnNextFrame.setLabel("Next");
+        btnNextFrame.setLocation(90, 30);
+        btnNextFrame.setSize(60, 30);
         btnNextFrame.setBackground(Color.black);
         btnNextFrame.setVisible(true);
+        
+        btnPrevFrame = new Button();
+        btnPrevFrame.setForeground(Color.white);
+        btnPrevFrame.setLabel("Prev");
+        btnPrevFrame.setLocation(30, 30);
+        btnPrevFrame.setSize(60, 30);
+        btnPrevFrame.setBackground(Color.black);
+        btnPrevFrame.setVisible(true);
         
         lbFrameName = new Label();
         lbFrameName.setForeground(Color.white);
@@ -66,9 +75,17 @@ public class FrameDisplay extends javax.swing.JFrame {
 
             }
         });
+        btnPrevFrame.addActionListener(new java.awt.event.ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                clickPrevFrame(e);
+
+            }
+        });
 
         //ADD CONTROL
         this.add(btnNextFrame);
+        this.add(btnPrevFrame);
         this.add(lbFrameName);
                 
 
@@ -83,13 +100,20 @@ public class FrameDisplay extends javax.swing.JFrame {
         currentFrame %= numOfArray;
         this.repaint();
     }
+    
+    private void clickPrevFrame(java.awt.event.ActionEvent evt) {
+        currentFrame--;
+        if(currentFrame<0) currentFrame = numOfArray-1;
+        this.repaint();
+    }
 
     public FrameDisplay() {
         initComponents();
         setupControl();
         extractorData = new ExtractorData();
         collectedArray = new int[numOfArray][defaultX][defaultY];
-        this.setSize(defaultX * scale + 2 * marginMX, defaultY * scale + 2 * marginMX);
+        this.setSize(defaultX * scale +  marginMX  , defaultY * scale +  marginMY + 50);
+        this.setAlwaysOnTop(true);
     }
 
     public void collectArray() {
@@ -129,9 +153,9 @@ public class FrameDisplay extends javax.swing.JFrame {
         collectedArray[index++] = extractorData.frameGhostVerhicel2;
         collectedArray[index++] = extractorData.frameGhostVerhicel3;
 
-        collectedArray[index++] = extractorData.frameTime;
-        collectedArray[index++] = extractorData.frameLevel;
-        collectedArray[index++] = extractorData.frameLiveLeft;
+   //     collectedArray[index++] = extractorData.frameTime;
+   //     collectedArray[index++] = extractorData.frameLevel;
+   //     collectedArray[index++] = extractorData.frameLiveLeft;
 
     }
 
@@ -168,9 +192,9 @@ public class FrameDisplay extends javax.swing.JFrame {
     public void paint(Graphics g) {
 
         g.setColor(Color.black);
-        g.fillRect(0, 0, defaultX * scale + 2 * marginMX, defaultY * scale + 2 * marginMX);
+        g.fillRect(0, 0, defaultX * scale + 2 * marginMX, defaultY * scale + 2 * marginMY);
         g.setColor(Color.white);
-        g.drawRect(0, 0, defaultX * scale + 2 * marginMX - 1, defaultY * scale + 2 * marginMX - 1);
+        g.drawRect(0, 0, defaultX * scale + 2 * marginMX - 1, defaultY * scale + 2 * marginMY - 1);
         
        lbFrameName.setText(frameName[currentFrame]);
         

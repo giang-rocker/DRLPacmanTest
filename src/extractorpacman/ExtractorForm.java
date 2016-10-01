@@ -10,6 +10,8 @@ import engine.pacman.game.Constants.GHOST;
 import java.awt.Color;
 import java.awt.Graphics;
 import engine.pacman.game.Game;
+import engine.pacman.game.GameView;
+import engine.pacman.game.GameView.GameFrame;
 import engine.pacman.game.internal.Node;
 import java.awt.Button;
 import java.awt.Checkbox;
@@ -29,8 +31,10 @@ import java.text.AttributedCharacterIterator;
 import static java.util.Objects.isNull;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.plaf.basic.BasicComboBoxUI;
+import javax.swing.text.JTextComponent;
 
 /**
  *
@@ -113,7 +117,7 @@ public class ExtractorForm extends javax.swing.JFrame {
     int timeStep;
     
     FrameDisplay FD ;
-
+    GameFrame  GF;
     public void initControl() {
 
         int PosY = 10;
@@ -353,6 +357,7 @@ public class ExtractorForm extends javax.swing.JFrame {
         FD.extractorData.loadGameFromGameState(logFile.getCurrentState()  );
         FD.collectArray();
         FD.repaint();
+         
 
     }
 
@@ -400,7 +405,7 @@ public class ExtractorForm extends javax.swing.JFrame {
        FD.collectArray();
        FD.repaint();
        FD.validate();
-
+      
           if (!isNull(gameStage)) {
             game.setGameState(gameStage);
             this.repaint();

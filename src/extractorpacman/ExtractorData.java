@@ -69,21 +69,23 @@ public class ExtractorData {
     int defaultX = 30;
     int defaultY = 28;
 
-    public void loadGameFromGameState(String gameState)   {
-        
-       this.game = new Game(0,0);
+    public void loadGameFromGameState(String gameState) {
+
+        this.game = new Game(0, 0);
         this.game.setGameState(gameState); // first gameStage
-         this.extractData();
+        this.extractData();
     }
 
-    public ExtractorData(){
-    _init();
+    public ExtractorData() {
+        _init();
     }
+
     public void _init() {
-        
-        if(isNull(this.game))
-        this.game = new Game(0,0);
-        
+
+        if (isNull(this.game)) {
+            this.game = new Game(0, 0);
+        }
+
         frameMiniMap = new int[defaultX][defaultY];
         framePill = new int[defaultX][defaultY];
         framePowerPill = new int[defaultX][defaultY];
@@ -123,43 +125,43 @@ public class ExtractorData {
         frameLiveLeft = new int[defaultX][defaultY];
 
         // RESET DATA
-        for (int i =0; i < defaultX; i++) {
-        Arrays.fill(frameMiniMap[i], 0); // path only
+        for (int i = 0; i < defaultX; i++) {
+            Arrays.fill(frameMiniMap[i], 0); // path only
 
-        Arrays.fill(framePill[i], 0);
-        Arrays.fill(framePowerPill[i], 0);
+            Arrays.fill(framePill[i], 0);
+            Arrays.fill(framePowerPill[i], 0);
 
-        // 12 frame
-        Arrays.fill(framePacmanLeft[i], 0);
-        Arrays.fill(framePacmanRight[i], 0);
-        Arrays.fill(framePacmanUp[i], 0);
-        Arrays.fill(framePacmanDown[i], 0);
-        Arrays.fill(framePacmanHorizontal0[i], 0);
-        Arrays.fill(framePacmanHorizontal1[i], 0);
-        Arrays.fill(framePacmanHorizontal2[i], 0);
-        Arrays.fill(framePacmanHorizontal3[i], 0);
-        Arrays.fill(framePacmanVerhicel0[i], 0);
-        Arrays.fill(framePacmanVerhicel1[i], 0);
-        Arrays.fill(framePacmanVerhicel2[i], 0);
-        Arrays.fill(framePacmanVerhicel3[i], 0);
+            // 12 frame
+            Arrays.fill(framePacmanLeft[i], 0);
+            Arrays.fill(framePacmanRight[i], 0);
+            Arrays.fill(framePacmanUp[i], 0);
+            Arrays.fill(framePacmanDown[i], 0);
+            Arrays.fill(framePacmanHorizontal0[i], 0);
+            Arrays.fill(framePacmanHorizontal1[i], 0);
+            Arrays.fill(framePacmanHorizontal2[i], 0);
+            Arrays.fill(framePacmanHorizontal3[i], 0);
+            Arrays.fill(framePacmanVerhicel0[i], 0);
+            Arrays.fill(framePacmanVerhicel1[i], 0);
+            Arrays.fill(framePacmanVerhicel2[i], 0);
+            Arrays.fill(framePacmanVerhicel3[i], 0);
 
-        // 12 frame
-        Arrays.fill(frameGhostLeft[i], 0);
-        Arrays.fill(frameGhostRight[i], 0);
-        Arrays.fill(frameGhostUp[i], 0);
-        Arrays.fill(frameGhostDown[i], 0);
-        Arrays.fill(frameGhostHorizontal0[i], 0);
-        Arrays.fill(frameGhostHorizontal1[i], 0);
-        Arrays.fill(frameGhostHorizontal2[i], 0);
-        Arrays.fill(frameGhostHorizontal3[i], 0);
-        Arrays.fill(frameGhostVerhicel0[i], 0);
-        Arrays.fill(frameGhostVerhicel1[i], 0);
-        Arrays.fill(frameGhostVerhicel2[i], 0);
-        Arrays.fill(frameGhostVerhicel3[i], 0);
+            // 12 frame
+            Arrays.fill(frameGhostLeft[i], 0);
+            Arrays.fill(frameGhostRight[i], 0);
+            Arrays.fill(frameGhostUp[i], 0);
+            Arrays.fill(frameGhostDown[i], 0);
+            Arrays.fill(frameGhostHorizontal0[i], 0);
+            Arrays.fill(frameGhostHorizontal1[i], 0);
+            Arrays.fill(frameGhostHorizontal2[i], 0);
+            Arrays.fill(frameGhostHorizontal3[i], 0);
+            Arrays.fill(frameGhostVerhicel0[i], 0);
+            Arrays.fill(frameGhostVerhicel1[i], 0);
+            Arrays.fill(frameGhostVerhicel2[i], 0);
+            Arrays.fill(frameGhostVerhicel3[i], 0);
 
-        Arrays.fill(frameTime[i], 0);
-        Arrays.fill(frameLevel[i], 0);
-        Arrays.fill(frameLiveLeft[i], 0);
+            Arrays.fill(frameTime[i], 0);
+            Arrays.fill(frameLevel[i], 0);
+            Arrays.fill(frameLiveLeft[i], 0);
         }
     }
 
@@ -172,15 +174,17 @@ public class ExtractorData {
             int y = game.getNodeXCood(i) / 4;
 
             frameMiniMap[x][y] = 1;
-            
-            if(game.getPillIndex(i)!=-1)
-            if ( game.isPillStillAvailable(game.getPillIndex(i))) {
-                framePill[x][y] = 1;
+
+            if (game.getPillIndex(i) != -1) {
+                if (game.isPillStillAvailable(game.getPillIndex(i))) {
+                    framePill[x][y] = 1;
+                }
             }
-            
-            if(game.getPowerPillIndex(i)!=-1)
-            if (game.isPowerPillStillAvailable(game.getPowerPillIndex(i))) {
-                framePowerPill[x][y] = 1;
+
+            if (game.getPowerPillIndex(i) != -1) {
+                if (game.isPowerPillStillAvailable(game.getPowerPillIndex(i))) {
+                    framePowerPill[x][y] = 1;
+                }
             }
 
         }
@@ -190,7 +194,10 @@ public class ExtractorData {
             int x = game.getNodeYCood(game.getPacmanCurrentNodeIndex()) / 4;
             int y = game.getNodeXCood(game.getPacmanCurrentNodeIndex()) / 4;
             
-            System.out.println(x +"- " + y);
+             int realPosX = game.getNodeYCood(game.getPacmanCurrentNodeIndex());
+            int realPosY = game.getNodeXCood(game.getPacmanCurrentNodeIndex());
+
+            System.out.println(x + "- " + y);
             framePacmanPosition[x][y] = 1;
 
             // SETUP PACMAN LEFT RIGHT UP DOWN
@@ -211,7 +218,7 @@ public class ExtractorData {
             }
 
             //SETUP PACMAN HORIZONTAL VERHICLE
-            switch (x % 4) {
+            switch (realPosX % 4) {
                 case 0:
                     framePacmanHorizontal0[x][y] = 1;
                     break;
@@ -226,7 +233,7 @@ public class ExtractorData {
                     break;
             }
 
-            switch (y % 4) {
+            switch ((realPosY) % 4) {
                 case 0:
                     framePacmanVerhicel0[x][y] = 1;
                     break;
@@ -245,9 +252,14 @@ public class ExtractorData {
 
         // SETUP GHOST POSITION  
         for (GHOST ghost : GHOST.values()) {
-            int x = game.getNodeYCood(game.getGhostCurrentNodeIndex(ghost)) / 4;
+            int x =  game.getNodeYCood(game.getGhostCurrentNodeIndex(ghost))/ 4;
             int y = game.getNodeXCood(game.getGhostCurrentNodeIndex(ghost)) / 4;
-
+            
+            int realPosX = game.getNodeYCood(game.getGhostCurrentNodeIndex(ghost));
+            int realPosY = game.getNodeXCood(game.getGhostCurrentNodeIndex(ghost));
+            
+            System.out.println("GHOST " + ghost.name() + " " + x + " " + y );
+            
             frameGhostPosition[x][y] = 1;
 
             // SETUP PACMAN LEFT RIGHT UP DOWN
@@ -268,7 +280,7 @@ public class ExtractorData {
             }
 
             //SETUP PACMAN HORIZONTAL VERHICLE
-            switch (x % 4) {
+            switch (realPosX % 4) {
                 case 0:
                     frameGhostHorizontal0[x][y] = 1;
                     break;
@@ -283,7 +295,7 @@ public class ExtractorData {
                     break;
             }
 
-            switch (y % 4) {
+            switch (realPosY % 4) {
                 case 0:
                     frameGhostVerhicel0[x][y] = 1;
                     break;
@@ -299,13 +311,13 @@ public class ExtractorData {
             }
 
         }
-        
-        for (int i =0; i < defaultX; i++){
-        Arrays.fill(frameLevel[i], game.getCurrentLevel());
-        Arrays.fill(frameTime[i], game.getTotalTime());
-        Arrays.fill(frameLiveLeft[i], game.getPacmanNumberOfLivesRemaining());
+
+        for (int i = 0; i < defaultX; i++) {
+            Arrays.fill(frameLevel[i], game.getCurrentLevel());
+            Arrays.fill(frameTime[i], game.getTotalTime());
+            Arrays.fill(frameLiveLeft[i], game.getPacmanNumberOfLivesRemaining());
         }
 
     }
- 
+
 }

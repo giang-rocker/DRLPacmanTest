@@ -398,7 +398,7 @@ public final class Game {
             ghostsEaten.put(ghost, Boolean.parseBoolean(values[++index]));
 
         pillWasEaten = Boolean.parseBoolean(values[++index]);
-        powerPillWasEaten = Boolean.parseBoolean(values[++index]);
+            powerPillWasEaten = Boolean.parseBoolean(values[++index]);
     }
 
     /**

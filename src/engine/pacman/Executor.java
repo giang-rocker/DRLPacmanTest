@@ -537,7 +537,10 @@ public class Executor {
 
         pacManController.terminate();
         ghostController.terminate();
-
+        
+        if(visual)
+                gv.getFrame().dispose();
+        
         saveToFile(replay.toString(), fileName, false);
         return stats;
     }

@@ -45,7 +45,7 @@ public class MultiTest {
 
                 if (visual) {
                     gv = new GameView(game).showGame();
-                    gv.getFrame().setLocation(200, 600);
+                    gv.getFrame().setLocation(400, 400);
                     gv.getFrame().setTitle("Experiment for MyPacMan");
 
                     if (pacManController instanceof HumanController) {
@@ -95,7 +95,7 @@ public class MultiTest {
 
         MultiTest mt = new MultiTest();
 
-        Stats stats[] = mt.runExperiment(new MyPacMan(), new POCommGhosts(50), numOfGame, " DONE ", -1, false);
+        Stats stats[] = mt.runExperiment(new MyPacMan(), new POCommGhosts(50), numOfGame, " DONE ", -1, true);
 
         for (int i = 0; i < stats.length; i++) {
             System.out.println(stats[i]);

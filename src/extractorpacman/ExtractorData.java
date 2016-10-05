@@ -194,7 +194,7 @@ public class ExtractorData {
             int x = game.getNodeYCood(game.getPacmanCurrentNodeIndex()) / 4;
             int y = game.getNodeXCood(game.getPacmanCurrentNodeIndex()) / 4;
             
-             int realPosX = game.getNodeYCood(game.getPacmanCurrentNodeIndex());
+            int realPosX = game.getNodeYCood(game.getPacmanCurrentNodeIndex());
             int realPosY = game.getNodeXCood(game.getPacmanCurrentNodeIndex());
 
             System.out.println(x + "- " + y);

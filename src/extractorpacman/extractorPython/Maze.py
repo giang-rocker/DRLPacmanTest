@@ -5,9 +5,13 @@
 # To change this template file, choose Tools | Templates
 # and open the template in the editor.
  
-
+from numpy import ndarray
+from Nodes import Node,Pill,PowerPill
 
 class Maze:
+    
+    default_width = 108
+    default_height = 116
     
     def __init__(self,_mazeName,_initialPacManNodeIndex,_lairNodeIndex,_initialGhostNodeIndex,_numberOfNode,_numberOfPill,_numberOfPowerPill,_numberOfJucntion):
      #initial infomation
@@ -19,6 +23,10 @@ class Maze:
         self.numberOfPill = _numberOfPill
         self.numberOfPowerPill = _numberOfPowerPill
         self.numberOfJucntion = _numberOfJucntion
+        
+        self.listNode = [Node] * _numberOfNode
+        self.listPill = [Pill] * _numberOfPill
+        self.listPowerPill = [PowerPill] * _numberOfPowerPill
     
     def print_maze(self):
         print ( "MazeInfo" )
@@ -30,6 +38,13 @@ class Maze:
         print ("numberOfPill: %d" %self.numberOfPill)
         print ("numberOfPowerPill: %d" %self.numberOfPowerPill)
         print ("numberOfJucntion: %d" %self.numberOfJucntion)
+        
+        # check power pill
+        for powerPill in self.listPowerPill :
+            print ("PowerPill : %d %d %d %d" % ( powerPill.powerPillIndex,  powerPill.nodeIndex, powerPill.x, powerPill.y ) )
+        
+        print ("pill : %d %d %d %d" % ( self.listPill[5].pillIndex,   self.listPill[5].nodeIndex,  self.listPill[5].x,  self.listPill[5].y ) )
+        print ("node : %d %d %d %d" % ( self.listNode[1291].pillIndex,   self.listNode[1291].nodeIndex,  self.listNode[1291].x,  self.listNode[1291].y ) )
         
 
 class GameState:
@@ -54,6 +69,8 @@ class GameState:
         self.pacmanWasEaten = _pacmanWasEaten
         self.pillWasEaten = _pillWasEaten
         self.powerPillWasEaten = _powerPillWasEaten
+        
+        
     
     def print_list_ghost (self):
         for ghost in self.ghosts:
@@ -76,15 +93,15 @@ class GameState:
         
         
     def print_game_state (self):
-        """
+        
         print ("mazeIndex: %d " %self.mazeIndex)
         print ("totalTime: %d" %self.totalTime)
         print ("score: %d" %self.score)
         print ("currentLevelTime: %d" %self.currentLevelTime)
         print ("levelCount: %d" %self.levelCount)
-        """
+        
         self.pacman.print_pacman()
-        """
+        
         
         self.print_list_ghost()
         self.print_pill_status()
@@ -94,6 +111,6 @@ class GameState:
         print ("pacmanWasEaten: %s" %self.pacmanWasEaten)
         print ("pillWasEaten: %s" %self.pillWasEaten)
         print ("powerPillWasEaten: %s" %self.powerPillWasEaten)
-        """
+        
     
     

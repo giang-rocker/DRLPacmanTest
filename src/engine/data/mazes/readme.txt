@@ -13,12 +13,12 @@ number of junctions in the maze
 
 All other lines corresponds to individual nodes on the graph. Each node has the following information:
 
-node index
-x-coordinate	
-y-coordinate
-neighbouring node in UP direction (-1 if none)
-neighbouring node in RIGHT direction (-1 if none)
-neighbouring node in DOWN direction (-1 if none)
-neighbouring node in LEFT direction (-1 if none)
-pill-index of the node (-1 if none)
-power-pill index of the node (-1 if none)
+node index 0
+x-coordinate	1 
+y-coordinate 2 
+neighbouring node in UP direction (-1 if none)3 
+neighbouring node in RIGHT direction (-1 if none)4 
+neighbouring node in DOWN direction (-1 if none)5 
+neighbouring node in LEFT direction (-1 if none)6 
+pill-index of the node (-1 if none)7 
+power-pill index of the node (-1 if none)8

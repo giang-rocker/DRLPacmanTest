@@ -12,6 +12,7 @@ class LogFile:
         self.logFileName= _logFileName
         self.gameState = self.get_all_game_state()
         self.currentTimeStep = 0
+        self.totalGameState = len (self.gameState)
         
     def get_all_game_state(self):
         logFile = open(self.logFileName+'.txt', 'r')

@@ -146,7 +146,7 @@ class Parse:
                 powerPill = PowerPill(nodeIndex,powerPillIndex,x,y)
                 mazeX.listPowerPill[powerPillIndex] = powerPill
 
-        mazeX.print_maze()
+        #mazeX.print_maze()
         return mazeX
  
  

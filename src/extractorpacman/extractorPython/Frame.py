@@ -23,6 +23,9 @@ class Frame:
         frames[1] =Frame ("Pill",Frame.create_frame_pill(_gameState))
         frames[2] =Frame ("PowerPill",Frame.create_frame_power_pill(_gameState))
         frames[3] =Frame ("PacManPosition",Frame.create_frame_paman_position(_gameState))
+
+        for i in range (4, Frame.numberOfFrame):
+            frames[i] =Frame ("PacManPosition",Frame.create_frame_paman_position(_gameState))
         
         return frames
         

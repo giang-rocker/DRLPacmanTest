@@ -35,7 +35,7 @@ print("START")
 for i in range (0 , 4):
     Parse.maze.append(Parse.parse_maze_info(listFileName[i]))
 
-stateIndex = 5000
+ 
  
 gameState = logFile.get_all_game_state()
 
@@ -45,12 +45,12 @@ for gamestate in gameState:
     inputNetWork.append( Frame.get_input_network ( Parse.parse_game_state(gamestate) )  )
 
 
-print("DONE parse %d game State" %len (inputNetWork))
+print("DONE parse %d game State" %len (gameState))
 stop = timeit.default_timer()
 
 #print ("Size of all input: %d Bytes"  %( sys.getsizeof(inputNetWork[0][0]) ))
-print ( str(stop-start)+ " seconds/%d" %stateIndex )
-print ("avg: %f/%d state" %((float)((stop-start)/stateIndex),1))
+print ( str(stop-start)+ " seconds/%d" %len(gameState ))
+print ("avg: %f/%d state" %((float)((stop-start)/ len(gameState)),1))
  
 scale=6
 margin =20

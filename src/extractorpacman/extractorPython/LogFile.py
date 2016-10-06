@@ -17,6 +17,7 @@ class LogFile:
     def get_all_game_state(self):
         logFile = open(self.logFileName+'.txt', 'r')
         listGameState=logFile.readlines()
+        listGameState.pop(len(listGameState)-1)
         return listGameState
     
     def is_end(self):

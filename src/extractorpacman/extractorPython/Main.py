@@ -9,9 +9,12 @@ import timeit
 
 
 def draw_frame(frame):
+    scale=6
+    margin =20
     canvas = Canvas(width=(Frame.frame_size_y*scale+2*margin), height=(Frame.frame_size_x*scale+2*margin), bg='black')  
     canvas.pack(side="left",expand=YES, fill=BOTH)
     
+  
 
     for i in range (1, Frame.frame_size_x):
                 for j in range (0, Frame.frame_size_y):
@@ -52,8 +55,9 @@ stop = timeit.default_timer()
 print ( str(stop-start)+ " seconds/%d" %len(gameState ))
 print ("avg: %f/%d state" %((float)((stop-start)/ len(gameState)),1))
  
-scale=6
-margin =20
+
  
 print("%d" %(len (inputNetWork)))
+
+print ("d ")
        

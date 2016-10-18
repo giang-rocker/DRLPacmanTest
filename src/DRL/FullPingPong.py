@@ -79,6 +79,7 @@ def createNetwork():
 
     return s, readout, h_fc1
 
+
 def trainNetwork(s, readout, h_fc1, sess):
     # define the cost function
     a = tf.placeholder("float", [None, ACTIONS])

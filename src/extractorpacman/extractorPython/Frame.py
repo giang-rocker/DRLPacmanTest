@@ -5,10 +5,11 @@
 # To change this template file, choose Tools | Templates
 # and open the template in the editor.
 from Move import MOVE
+import numpy as np
 class Frame:
     
     frame_size_x = 30
-    frame_size_y = 28
+    frame_size_y = 30
     numberOfFrame  = 34
     
     def __init__(self,_frameName,_matrix):
@@ -19,39 +20,53 @@ class Frame:
     def get_input_network(_gameState):
         frames = []
         
+        frameMatrix=[]
+        
         frames.append(Frame ("Path",Frame.create_frame_path(_gameState)))
+        frameMatrix.append(Frame.create_frame_path(_gameState))
         frames.append(Frame ("Pill",Frame.create_frame_pill(_gameState)))
+        frameMatrix.append(Frame.create_frame_pill(_gameState))
         frames.append(Frame ("PowerPill",Frame.create_frame_power_pill(_gameState)))
+        frameMatrix.append(Frame.create_frame_power_pill(_gameState))
         
         #9 frame of pacman Position [3-11]
         framePacman =Frame.create_frame_paman_position(_gameState)
         for i in range (0,9):
             frames.append( Frame("PacmanPosition", framePacman[i]))
+            frameMatrix.append(framePacman[i])
 
         #5 frame of pacman last Move  [12-16]
         framePacman = Frame.create_frame_paman_lastMove(_gameState)
         for i in range (0,5):
             frames.append( Frame("PacmanLastMove", framePacman[i]))
+            frameMatrix.append(framePacman[i])
         
             
         #9 frame of pacman Position [17-25]
         framePacman =Frame.create_frame_ghost_position(_gameState)
         for i in range (0,9):
             frames.append( Frame("GhostPosition", framePacman[i]))
+            frameMatrix.append(framePacman[i])
 
         #5 frame of pacman last Move  [26-30]
         framePacman = Frame.create_frame_ghost_lastMove(_gameState)
         for i in range (0,5):
-            frames.append( Frame("GhostLastMove", framePacman[i]))    
+            frames.append( Frame("GhostLastMove", framePacman[i])) 
+            frameMatrix.append(framePacman[i])
         
         #1 edible Time    31
         frames.append(Frame ("edibleTime",Frame.create_frame_edible_time(_gameState)))
+        frameMatrix.append(Frame.create_frame_edible_time(_gameState))
         #1 CurrentLevel Level    32
         frames.append(Frame ("currentLevel",Frame.create_frame_current_time(_gameState)))
+        frameMatrix.append(Frame.create_frame_current_time(_gameState))
         #1 Current Time    33
         frames.append(Frame ("currentTime",Frame.create_frame_current_level(_gameState)))
+        frameMatrix.append(Frame.create_frame_current_level(_gameState))
         
-        return frames
+        frameMatrixReturn = np.stack(frameMatrix, axis = 2)
+        
+        return frameMatrixReturn
         
     @staticmethod
     def create_frame_path(_gameState):

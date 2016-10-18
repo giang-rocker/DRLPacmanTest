@@ -1,4 +1,12 @@
 #currently following FullPingPong.py
+import sys
+from tkinter import *
+from Parse import Parse
+from LogFile import LogFile
+from Frame import Frame
+from datetime import datetime
+from Move import MOVE
+import timeit
 
 import tensorflow as tf
 import sys
@@ -17,7 +25,7 @@ BATCH = 50 # size of minibatch
 K = 1 # only select an action every Kth frame, repeat prev for others
 SIZEX = 30
 SIZEY=30
-NUM_OF_FRAME = 32
+NUM_OF_FRAME = 34
 
 def weight_variable(shape):
     initial = tf.truncated_normal(shape, stddev = 0.01)
@@ -36,7 +44,7 @@ def max_pool_2x2(x):
 def createNetwork():
     # network weights
     # size of filter X, Y , number of input, number of output
-    W_conv1 = weight_variable([5, 5, 32, 32])
+    W_conv1 = weight_variable([5, 5, NUM_OF_FRAME, 32])
     # number of output
     b_conv1 = bias_variable([32])
 
@@ -46,7 +54,7 @@ def createNetwork():
     W_conv3 = weight_variable([2, 2, 64, 64])
     b_conv3 = bias_variable([64])
 
-    W_fc1 = weight_variable([1600, 512])
+    W_fc1 = weight_variable([256, 512])
     b_fc1 = bias_variable([512])
 
     W_fc2 = weight_variable([512, ACTIONS])
@@ -56,10 +64,10 @@ def createNetwork():
     input_layer = tf.placeholder("float", [None, SIZEX, SIZEY, NUM_OF_FRAME])
 
     # hidden layers
-    h_conv1 = tf.nn.relu(conv2d(input_layer, W_conv1, 4) + b_conv1)
+    h_conv1 = tf.nn.relu(conv2d(input_layer, W_conv1, 2) + b_conv1)
     h_pool1 = max_pool_2x2(h_conv1)
 
-    h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2, 2) + b_conv2)
+    h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2, 1) + b_conv2)
     h_pool2 = max_pool_2x2(h_conv2)
 
     h_conv3 = tf.nn.relu(conv2d(h_conv2, W_conv3, 1) + b_conv3)
@@ -67,7 +75,7 @@ def createNetwork():
 
     #h_pool3_flat = tf.reshape(h_pool3, [-1, 256])
     # 1600 how many sate ?
-    h_conv3_flat = tf.reshape(h_conv3, [-1, 1600])
+    h_conv3_flat = tf.reshape(h_conv3, [-1, 256])
 
     h_fc1 = tf.nn.relu(tf.matmul(h_conv3_flat, W_fc1) + b_fc1)
 
@@ -78,34 +86,81 @@ def createNetwork():
 
 #start
 
-def trainNetwork(s, readout, h_fc1, sess):
+def calculate_value_game_state(s, readout, h_fc1, sess, gameState):
     
     a = tf.placeholder("float", [None, ACTIONS])
-    
     y = tf.placeholder("float", [None])
-    #read out : 5x1 the last result
     readout_action = tf.reduce_sum(tf.mul(readout, a), reduction_indices = 1)
     
     cost = tf.reduce_mean(tf.square(y - readout_action))
-    
     train_step = tf.train.AdamOptimizer(1e-6).minimize(cost)
     
-    #GETSTATE
-    x_t, r_0, terminal = game_state.frame_step(do_nothing)
-    x_t = cv2.cvtColor(cv2.resize(x_t, (80, 80)), cv2.COLOR_BGR2GRAY)
-    ret, x_t = cv2.threshold(x_t,1,255,cv2.THRESH_BINARY)
-    s_t = np.stack((x_t, x_t, x_t, x_t), axis = 2)
-    
-    # initial
     sess.run(tf.initialize_all_variables())
     
-    readout_t = readout.eval(feed_dict = {s : [s_t]})[0]
-    action_index = np.argmax(readout_t)
     
-    print(readout_t)
-    print(action_index)
+    s_t=[]
+    s_t.append(Frame.get_input_network(Parse.parse_game_state(gameState[400])))
+    s_t.append(Frame.get_input_network(Parse.parse_game_state(gameState[401])))
+    
+    # initial
+    for i in range (0,2):
+        readout_t = readout.eval(feed_dict = {s : [s_t[i]]})[0]
+        action_index = np.argmax(readout_t)
+        print(readout_t)
+        print(action_index)
+        
+    
+    readout_j1_batch = readout.eval(feed_dict = {s : [s_t[1]]})[0]
+    reward = 3
+    a_t = np.zeros([ACTIONS])
+    a_t[Parse.parse_game_state(gameState[401]).pacman.lastMoveMade] = 1
+     
+    y_batch=[]
+    a_batch=[]
+    s_j_batch=[]  
+    
+    y_batch.append(reward + GAMMA * np.max(readout_j1_batch))    
+    a_batch.append(a_t)  
+    print(Parse.parse_game_state(gameState[401]).pacman.lastMoveMade)
+    s_j_batch.append(s_t[0])
+    
+    train_step.run(feed_dict = {
+                y : y_batch,
+                a : a_batch,
+                input_layer : s_j_batch})
+        
+        
+    print("DONE TRAIN")   
+    
+    s_t=[]
+    s_t.append(Frame.get_input_network(Parse.parse_game_state(gameState[400])))
+    s_t.append(Frame.get_input_network(Parse.parse_game_state(gameState[401])))
+    
+    # initial
+    for i in range (0,2):
+        readout_t = readout.eval(feed_dict = {s : [s_t[i]]})[0]
+        action_index = np.argmax(readout_t)
+        print(readout_t)
+        print(action_index)
+        
+    return 
+
+
+#GET GAME STATE
 
 
 sess = tf.InteractiveSession()
-s, readout, h_fc1 = createNetwork()
-trainNetwork(s, readout, h_fc1, sess)
+
+logFile = LogFile("logGame")
+
+# PRE-CALCULATE BLANK MAZE
+listFileName=["a","b","c","d"]
+for i in range (0 , 4):
+    Parse.maze.append(Parse.parse_maze_info(listFileName[i]))
+# GET ALL GAME STATES
+gameState = logFile.get_all_game_state()
+ 
+
+input_layer, readout, h_fc1 = createNetwork()
+calculate_value_game_state(input_layer, readout, h_fc1, sess, gameState)
+ 

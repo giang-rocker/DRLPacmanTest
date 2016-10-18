@@ -56,10 +56,10 @@ def createNetwork():
     W_conv3 = weight_variable([2, 2, 64, 64])
     b_conv3 = bias_variable([64])
 
-    W_fc1 = weight_variable([4096, 512])
-    b_fc1 = bias_variable([512])
+    W_fc1 = weight_variable([256, 256])
+    b_fc1 = bias_variable([256])
 
-    W_fc2 = weight_variable([512, ACTIONS])
+    W_fc2 = weight_variable([256, ACTIONS])
     b_fc2 = bias_variable([ACTIONS])
 
     # INPUT LAYER
@@ -72,14 +72,14 @@ def createNetwork():
     h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2, 1) + b_conv2)
     h_pool2 = max_pool_2x2(h_conv2)
 
-    h_conv3 = tf.nn.relu(conv2d(h_conv2, W_conv3, 1) + b_conv3)
+    h_conv3 = tf.nn.relu(conv2d(h_pool2, W_conv3, 1) + b_conv3)
     h_pool3 = max_pool_2x2(h_conv3)
 
-    #h_pool3_flat = tf.reshape(h_pool3, [-1, 256])
+    h_pool3_flat = tf.reshape(h_pool3, [-1, 256])
     # 1600 how many sate ?
-    h_conv3_flat = tf.reshape(h_conv3, [-1, 4096])
+    #h_conv3_flat = tf.reshape(h_conv3, [-1, 256])
 
-    h_fc1 = tf.nn.relu(tf.matmul(h_conv3_flat, W_fc1) + b_fc1)
+    h_fc1 = tf.nn.relu(tf.matmul(h_pool3_flat, W_fc1) + b_fc1)
 
     # readout layer
     readout = tf.matmul(h_fc1, W_fc2) + b_fc2

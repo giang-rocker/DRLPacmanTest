@@ -21,11 +21,13 @@ EXPLORE = 500. # frames over which to anneal epsilon
 FINAL_EPSILON = 0.05 # final value of epsilon
 INITIAL_EPSILON = 1.0 # starting value of epsilon
 REPLAY_MEMORY = 590000 # number of previous transitions to remember
-BATCH = 50 # size of minibatch
+BATCH = 100 # size of minibatch
 K = 1 # only select an action every Kth frame, repeat prev for others
 SIZEX = 30
 SIZEY=30
 NUM_OF_FRAME = 34
+TRANING_TIME = 5
+
 
 def weight_variable(shape):
     initial = tf.truncated_normal(shape, stddev = 0.01)
@@ -54,7 +56,7 @@ def createNetwork():
     W_conv3 = weight_variable([2, 2, 64, 64])
     b_conv3 = bias_variable([64])
 
-    W_fc1 = weight_variable([256, 512])
+    W_fc1 = weight_variable([4096, 512])
     b_fc1 = bias_variable([512])
 
     W_fc2 = weight_variable([512, ACTIONS])
@@ -75,7 +77,7 @@ def createNetwork():
 
     #h_pool3_flat = tf.reshape(h_pool3, [-1, 256])
     # 1600 how many sate ?
-    h_conv3_flat = tf.reshape(h_conv3, [-1, 256])
+    h_conv3_flat = tf.reshape(h_conv3, [-1, 4096])
 
     h_fc1 = tf.nn.relu(tf.matmul(h_conv3_flat, W_fc1) + b_fc1)
 
@@ -86,8 +88,8 @@ def createNetwork():
 
 #start
 
-def calculate_value_game_state(s, readout, h_fc1, sess, gameState):
-    
+def tranning_network(s, readout, h_fc1, sess, gameState):
+    print("START OF TRAINING NETWORK")
     a = tf.placeholder("float", [None, ACTIONS])
     y = tf.placeholder("float", [None])
     readout_action = tf.reduce_sum(tf.mul(readout, a), reduction_indices = 1)
@@ -97,58 +99,93 @@ def calculate_value_game_state(s, readout, h_fc1, sess, gameState):
     
     sess.run(tf.initialize_all_variables())
     
-    
-    s_t=[]
-    s_t.append(Frame.get_input_network(Parse.parse_game_state(gameState[400])))
-    s_t.append(Frame.get_input_network(Parse.parse_game_state(gameState[401])))
-    
-    # initial
-    for i in range (0,2):
-        readout_t = readout.eval(feed_dict = {s : [s_t[i]]})[0]
-        action_index = np.argmax(readout_t)
-        print(readout_t)
-        print(action_index)
+    #first state
+    timeStep = 0
+    s_t = gameState[timeStep]
+    D=[]
+    print("ADD GAME STATE TO DOMAIN")
+    # add all 10k gameState to Domain
+    for i in range(1, len(gameState)):
         
-    
-    readout_j1_batch = readout.eval(feed_dict = {s : [s_t[1]]})[0]
-    reward = 3
-    a_t = np.zeros([ACTIONS])
-    a_t[Parse.parse_game_state(gameState[401]).pacman.lastMoveMade] = 1
-     
-    y_batch=[]
-    a_batch=[]
-    s_j_batch=[]  
-    
-    y_batch.append(reward + GAMMA * np.max(readout_j1_batch))    
-    a_batch.append(a_t)  
-    print(Parse.parse_game_state(gameState[401]).pacman.lastMoveMade)
-    s_j_batch.append(s_t[0])
-    
-    train_step.run(feed_dict = {
-                y : y_batch,
-                a : a_batch,
-                input_layer : s_j_batch})
+        #SET ACTION
+        a_t = np.zeros([ACTIONS])
+        action_index = 0
+        gameStateObjectNext = Parse.parse_game_state(gameState[timeStep+1])
+        action_index = gameStateObjectNext.pacman.lastMoveMade
+        a_t[action_index] = 1
+        
+        # SET REWARD
+        r_t = gameStateObjectNext.score
+        
+        # SET NEXTSTATE
+        s_t1 = gameState[timeStep+1]
+        
+        # if GAME OVER SET TERMINAL
+        terminal = (gameStateObjectNext.pacman.numberOfLivesRemaining >0) 
+        
+        #ADD TO DOMAIN
+        D.append((s_t, a_t, r_t, s_t1, terminal))
+        
+        # NEXT STATE IN SEQUENCE
+        s_t = s_t1
+        timeStep += 1
         
         
-    print("DONE TRAIN")   
-    
-    s_t=[]
-    s_t.append(Frame.get_input_network(Parse.parse_game_state(gameState[400])))
-    s_t.append(Frame.get_input_network(Parse.parse_game_state(gameState[401])))
-    
-    # initial
-    for i in range (0,2):
-        readout_t = readout.eval(feed_dict = {s : [s_t[i]]})[0]
-        action_index = np.argmax(readout_t)
-        print(readout_t)
-        print(action_index)
+    print("DONE ADD GAME STATE TO DOMAIN")
+    print("START TO TRAINING BATCH")
+    #training 1k times with BATCH size
+    for i in range (0,TRANING_TIME):
+        print ("Training Time %d " %i )
+        #random BATCH gamestate in Domain D
+        minibatch = random.sample(D, BATCH)
+
+        # get the batch variables
         
+        list_s_j = [d[0] for d in minibatch]
+        s_j_batch = []
+        for state in list_s_j:
+            s_j_batch.append( Frame.get_input_network ( Parse.parse_game_state(state) )  )
+        
+        
+        a_batch = [d[1] for d in minibatch]
+        r_batch = [d[2] for d in minibatch]
+        
+        list_s_j1 = [d[3] for d in minibatch]
+        s_j1_batch = []
+        for state in list_s_j1:
+            s_j1_batch.append( Frame.get_input_network ( Parse.parse_game_state(state) )  )
+
+        y_batch = []
+        
+        readout_j1_batch = readout.eval(feed_dict = {s : s_j1_batch})
+        
+        for k in range(0, len(minibatch)):
+            # if terminal only equals reward
+            if minibatch[i][4]:
+                y_batch.append(r_batch[k])
+            else:
+                y_batch.append(r_batch[k] + GAMMA * np.max(readout_j1_batch[k]))
+
+        # perform gradient step
+        train_step.run(feed_dict = {
+            y : y_batch,
+            a : a_batch,
+            input_layer : s_j_batch})
+            
+        print ("DONE")
+
+
+    
+        
+    print("DONE TRAIN ONE GAME")   
+    
+    
     return 
 
 
 #GET GAME STATE
 
-
+timeStart = timeit.default_timer()
 sess = tf.InteractiveSession()
 
 logFile = LogFile("logGame")
@@ -162,5 +199,8 @@ gameState = logFile.get_all_game_state()
  
 
 input_layer, readout, h_fc1 = createNetwork()
-calculate_value_game_state(input_layer, readout, h_fc1, sess, gameState)
+tranning_network(input_layer, readout, h_fc1, sess, gameState)
  
+timeEnd =start = timeit.default_timer()
+
+print ( str(timeEnd-timeStart)+ " seconds to train %d " %TRANING_TIME + " batch of %d " %BATCH )

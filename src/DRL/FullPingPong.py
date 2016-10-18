@@ -14,6 +14,9 @@ from collections import deque
 GAME = 'tetris' # the name of the game being played for log files
 ACTIONS = 6 # number of valid actions
 GAMMA = 0.99 # decay rate of past observations
+EXP
+#FOR RANDOM ACTION. FIRST OBSERVE TIMESTEPS: RANDOM BY exp. FROM OBSERVE TO EXPLORE. REDUCE esp. FROM EXPLORE, BASE ON NETWORK
+
 OBSERVE = 500. # timesteps to observe before training
 EXPLORE = 500. # frames over which to anneal epsilon
 FINAL_EPSILON = 0.05 # final value of epsilon
@@ -115,21 +118,22 @@ def trainNetwork(s, readout, h_fc1, sess):
     epsilon = INITIAL_EPSILON
     t = 0
     while "pigs" != "fly":
-        # choose an action epsilon greedily
+        # CHOOSE (ONLY) an action epsilon greedily or GET THE MAX ACTION FROM CURRENT STATE
         readout_t = readout.eval(feed_dict = {s : [s_t]})[0]
         a_t = np.zeros([ACTIONS])
         action_index = 0
         if random.random() <= epsilon or t <= OBSERVE:
             action_index = random.randrange(ACTIONS)
             a_t[action_index] = 1
-        else:
+        else: #or GET THE MAX ACTION FROM CURRENT STATE
             action_index = np.argmax(readout_t)
             a_t[action_index] = 1
 
-        # scale down epsilon
+        # scale down epsilon REDUCE BY TIME WHEN THE NETWORK GETTING BETTER
         if epsilon > FINAL_EPSILON and t > OBSERVE:
             epsilon -= (INITIAL_EPSILON - FINAL_EPSILON) / EXPLORE
-
+            
+        #APPLING NEXT ACTION TO GET NEXT STATE    
         for i in range(0, K):
             # run the selected action and observe next state and reward
             x_t1_col, r_t, terminal = game_state.frame_step(a_t)
@@ -140,6 +144,7 @@ def trainNetwork(s, readout, h_fc1, sess):
 
             # store the transition in D
             D.append((s_t, a_t, r_t, s_t1, terminal))
+            #If it is out of replay memory
             if len(D) > REPLAY_MEMORY:
                 D.popleft()
 

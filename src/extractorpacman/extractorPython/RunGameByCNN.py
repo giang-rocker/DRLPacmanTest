@@ -7,7 +7,7 @@ from Frame import Frame
 from datetime import datetime
 from Move import MOVE
 import timeit
-from subprocess import Popen, PIPE, STDOUT
+import socket  
 
 import tensorflow as tf
 import sys
@@ -100,7 +100,7 @@ def calculate_value_game_state(s, readout, h_fc1, sess, gameState):
     
     gameObject = Parse.parse_game_state(gameState)
     
-    print("AT Game Step: %d Score %d" %(gameObject.totalTime, gameObject.score))
+    #print("AT Game Step: %d Score %d" %(gameObject.totalTime, gameObject.score))
 
     
     s_t=Frame.get_input_network(gameObject)
@@ -117,7 +117,6 @@ def calculate_value_game_state(s, readout, h_fc1, sess, gameState):
 
 sess = tf.InteractiveSession()
 
-logFile = LogFile("logGame")
 
 # PRE-CALCULATE BLANK MAZE
 listFileName=["a","b","c","d"]
@@ -129,25 +128,35 @@ for i in range (0 , 4):
 
 input_layer, readout, h_fc1 = createNetwork()
 
-terminator = False
+ 
+ 
 command ="START_GAME"
 gameState = "xxx"
 action = 4
-print(command)
+ 
+s = socket.socket()         # Create a socket object
+host = socket.gethostname() # Get local machine name
+port = 5000     
+s.connect((host, port))
+s.send((command +"\n").encode())
+terminator=False
 
 while(terminator==False):
-    args = ['ExtractorPacman.jar', command, gameState,str(action)] 
-    p = Popen(['java', '-jar']+list(args), stdout=PIPE, stderr=STDOUT)
-    for line in p.stdout:
-        gameState = line.decode('utf-8')
-    command = "RUN_GAME"
-    
+    gameState = s.recv(port)
+   
     if(gameState=="GAME_OVER"):
         terminator = True
     else :
-        action  = calculate_value_game_state(input_layer, readout, h_fc1, sess, gameState)
-        print("Return action index: %d -  %s" %(action, MOVE.get_move(action)))
-    
-    print("")
+         
+        gameStateX = gameState.decode("utf-8") 
+        
+        #print(gameStateX)
+        action  = calculate_value_game_state(input_layer, readout, h_fc1, sess, gameStateX)
+        print("%s" %(MOVE.get_move(action)))
+        s.send(("%d" %(action) +"\n").encode())
+
+
 print("GAME_OVER")
+s.close 
     
+

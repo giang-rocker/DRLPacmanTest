@@ -98,14 +98,17 @@ def calculate_value_game_state(s, readout, h_fc1, sess, gameState):
     
     sess.run(tf.initialize_all_variables())
     
+    gameObject = Parse.parse_game_state(gameState)
     
-    s_t=Frame.get_input_network(Parse.parse_game_state(gameState))
+    print("AT Game Step: %d Score %d" %(gameObject.totalTime, gameObject.score))
+
+    
+    s_t=Frame.get_input_network(gameObject)
      
     readout_t = readout.eval(feed_dict = {s : [s_t]})[0]
     action_index = np.argmax(readout_t)
     
     print(readout_t)
-    print(action_index)
     return action_index
 
 
@@ -130,8 +133,9 @@ terminator = False
 command ="START_GAME"
 gameState = "xxx"
 action = 4
+print(command)
+
 while(terminator==False):
-    print(command)
     args = ['ExtractorPacman.jar', command, gameState,str(action)] 
     p = Popen(['java', '-jar']+list(args), stdout=PIPE, stderr=STDOUT)
     for line in p.stdout:
@@ -142,6 +146,8 @@ while(terminator==False):
         terminator = True
     else :
         action  = calculate_value_game_state(input_layer, readout, h_fc1, sess, gameState)
-        print("RETURN TO JAVA %d" %action)
-        
+        print("Return action index: %d -  %s" %(action, MOVE.get_move(action)))
+    
+    print("")
+print("GAME_OVER")
     

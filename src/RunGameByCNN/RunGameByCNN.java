@@ -14,6 +14,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.EnumMap;
@@ -24,14 +25,60 @@ import java.util.EnumMap;
  */
 public class RunGameByCNN {
 
+    public static MOVE getMove(int ret) {
+        MOVE nextMove = MOVE.NEUTRAL;
+        switch (ret) {
+            case 0:
+                nextMove = MOVE.DOWN;
+                break;
+            case 1:
+                nextMove = MOVE.LEFT;
+                break;
+            case 2:
+                nextMove = MOVE.UP;
+                break;
+            case 3:
+                nextMove = MOVE.RIGHT;
+                break;
+            default:
+                nextMove = MOVE.NEUTRAL;
+                break;
+        }
+        return nextMove;
+    }
+
+    public static String getMoveString(int ret) {
+        String stringMove = "";
+        switch (ret) {
+            case 0:
+                stringMove = "DOWN";
+                break;
+            case 1:
+                stringMove = "LEFT";
+                break;
+            case 2:
+                stringMove = "UP";
+                break;
+            case 3:
+                stringMove = "RIGHT";
+                break;
+            default:
+                stringMove = "NEUTRAL";
+                break;
+        }
+        return stringMove;
+    }
+
     public static void main(String[] args) throws IOException {
         int numOfGame = 0;
         int maxScore = 0;
         int maxTime = 0;
         ServerSocket s = new ServerSocket(22009);//22009
+        System.out.println("HOSTNAME: " + InetAddress.getLocalHost().getHostName());
+
         Socket ss;
-      //  FormRunCNN formRunCNN = new FormRunCNN();
-     //   formRunCNN.setVisible(true);
+        //  FormRunCNN formRunCNN = new FormRunCNN();
+        //   formRunCNN.setVisible(true);
         Game game = new Game(0);
         MOVE nextMove = MOVE.NEUTRAL;
         String stringMove = "";
@@ -61,7 +108,7 @@ public class RunGameByCNN {
 
             if (command.indexOf("TRANNING") != -1) {
                 percentTranning = Float.parseFloat(command.substring(("TRANNING").length()));
-            //    formRunCNN.setValue(stringMove, game.getTotalTime(), game.getScore(), numOfGame, maxScore, maxTime, true, percentTranning);
+                //    formRunCNN.setValue(stringMove, game.getTotalTime(), game.getScore(), numOfGame, maxScore, maxTime, true, percentTranning);
                 continue;
             } else if (command.equals("START_GAME")) {
                 if (game.getScore() > maxScore) {
@@ -80,30 +127,30 @@ public class RunGameByCNN {
                 // convert to int
                 int ret = Integer.parseInt(command);
 
-                // convert to MOVE
-                switch (ret) {
-                    case 0:
-                        nextMove = MOVE.DOWN;
-                        stringMove = "DOWN";
-                        break;
-                    case 1:
-                        nextMove = MOVE.LEFT;
-                        stringMove = "LEFT";
-                        break;
-                    case 2:
-                        nextMove = MOVE.UP;
-                        stringMove = "UP";
-                        break;
-                    case 3:
-                        nextMove = MOVE.RIGHT;
-                        stringMove = "RIGHT";
-                        break;
-                    default:
-                        nextMove = MOVE.NEUTRAL;
-                        stringMove = "NEUTRAL";
-                        break;
+                // for sure becase max is 4
+                // get valid move by ID
+                if (ret > 5) {
+                    int actionIndex = -1;
+                    for (int i = 0; i < 4; i++) {
+                        actionIndex = ret % 10;
+                        MOVE tempMove = getMove(actionIndex);
+
+                        if (game.getNeighbour(game.getPacmanCurrentNodeIndex(), tempMove) != -1) {
+                            nextMove = tempMove;
+                            break;
+                        }
+
+                        ret /= 10;
+                    }
+
+                }
+                else { // return random move
+                
+                    nextMove = getMove(ret);
+                
                 }
 
+                // convert to MOVE
                 // advance
                 // wrong move
                 if (game.getNeighbour(game.getPacmanCurrentNodeIndex(), nextMove) == -1) {
@@ -132,8 +179,7 @@ public class RunGameByCNN {
                 }
             }
 
-         //   formRunCNN.setValue(stringMove, game.getTotalTime(), game.getScore(), numOfGame, maxScore, maxTime, game.gameOver(), percentTranning);
-
+            //   formRunCNN.setValue(stringMove, game.getTotalTime(), game.getScore(), numOfGame, maxScore, maxTime, game.gameOver(), percentTranning);
         }
 
     }

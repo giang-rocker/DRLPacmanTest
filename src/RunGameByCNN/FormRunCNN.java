@@ -28,14 +28,22 @@ public class FormRunCNN extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        label1 = new java.awt.Label();
-        label2 = new java.awt.Label();
-        label3 = new java.awt.Label();
         jScrollPane1 = new javax.swing.JScrollPane();
-        txtReturn = new javax.swing.JTextArea();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        txtGameState = new javax.swing.JTextArea();
+        jTextArea1 = new javax.swing.JTextArea();
+        label1 = new java.awt.Label();
+        label3 = new java.awt.Label();
         txtCommand = new javax.swing.JTextField();
+        txtReturn = new javax.swing.JTextField();
+        jLabel1 = new javax.swing.JLabel();
+        txtStatus = new javax.swing.JLabel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        txtSumary = new javax.swing.JTextArea();
+        label4 = new java.awt.Label();
+        txtScore = new javax.swing.JTextField();
+
+        jTextArea1.setColumns(20);
+        jTextArea1.setRows(5);
+        jScrollPane1.setViewportView(jTextArea1);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setAlwaysOnTop(true);
@@ -43,66 +51,90 @@ public class FormRunCNN extends javax.swing.JFrame {
 
         label1.setText("COMMAND");
 
-        label2.setText("GAME STATE");
-
         label3.setForeground(new java.awt.Color(0, 0, 0));
-        label3.setText("RETURN");
-
-        jScrollPane1.setForeground(new java.awt.Color(255, 255, 255));
-
-        txtReturn.setBackground(new java.awt.Color(255, 255, 255));
-        txtReturn.setColumns(20);
-        txtReturn.setForeground(new java.awt.Color(0, 0, 0));
-        txtReturn.setLineWrap(true);
-        txtReturn.setRows(5);
-        jScrollPane1.setViewportView(txtReturn);
-
-        jScrollPane2.setForeground(new java.awt.Color(255, 255, 255));
-
-        txtGameState.setBackground(new java.awt.Color(255, 255, 255));
-        txtGameState.setColumns(20);
-        txtGameState.setForeground(new java.awt.Color(0, 0, 0));
-        txtGameState.setLineWrap(true);
-        txtGameState.setRows(5);
-        jScrollPane2.setViewportView(txtGameState);
+        label3.setText("RETURN STATE");
 
         txtCommand.setBackground(new java.awt.Color(255, 255, 255));
         txtCommand.setForeground(new java.awt.Color(0, 0, 0));
-        txtCommand.setText("jTextField1");
+
+        txtReturn.setBackground(new java.awt.Color(255, 255, 255));
+        txtReturn.setForeground(new java.awt.Color(0, 0, 0));
+
+        jLabel1.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel1.setText("STATUS BOARD");
+
+        txtStatus.setForeground(new java.awt.Color(0, 0, 0));
+        txtStatus.setText("[status: ]");
+
+        txtSumary.setEditable(false);
+        txtSumary.setBackground(new java.awt.Color(255, 255, 255));
+        txtSumary.setColumns(20);
+        txtSumary.setForeground(new java.awt.Color(0, 0, 0));
+        txtSumary.setRows(5);
+        txtSumary.setText("Sumary:");
+        txtSumary.setAutoscrolls(false);
+        jScrollPane2.setViewportView(txtSumary);
+
+        label4.setForeground(new java.awt.Color(0, 0, 0));
+        label4.setText("SCORE");
+
+        txtScore.setBackground(new java.awt.Color(255, 255, 255));
+        txtScore.setForeground(new java.awt.Color(0, 0, 0));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(label3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(label2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(label1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jScrollPane1)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 345, Short.MAX_VALUE)
-                    .addComponent(txtCommand))
-                .addContainerGap(65, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(162, 162, 162)
+                        .addComponent(txtStatus))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(168, 168, 168)
+                        .addComponent(jLabel1))
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(label3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(label1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                    .addComponent(txtCommand, javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(txtReturn, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addComponent(label4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(txtScore, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(14, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(54, 54, 54)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(label1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtCommand, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(17, 17, 17)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(label2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(14, 14, 14)
+                .addComponent(jLabel1)
                 .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(label3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(33, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(label1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtCommand, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(label3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtReturn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtScore, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(label4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 26, Short.MAX_VALUE)
+                .addComponent(txtStatus)
+                .addContainerGap())
         );
 
         pack();
@@ -144,21 +176,45 @@ public class FormRunCNN extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JTextArea jTextArea1;
     private java.awt.Label label1;
-    private java.awt.Label label2;
     private java.awt.Label label3;
+    private java.awt.Label label4;
     private javax.swing.JTextField txtCommand;
-    private javax.swing.JTextArea txtGameState;
-    private javax.swing.JTextArea txtReturn;
+    private javax.swing.JTextField txtReturn;
+    private javax.swing.JTextField txtScore;
+    private javax.swing.JLabel txtStatus;
+    private javax.swing.JTextArea txtSumary;
     // End of variables declaration//GEN-END:variables
-
-public void setValue (String command, String gameState, String returnValue){
-
+ static int count = 0;   
+ String runningString = "[status: running ...]";
+  String traninngString = "[status: tranning ...";
+public void setValue (String command, int timeStep, int score, int numOfGame, int maxScore, int maxTime, boolean gameOver,float percentTranning){
+    if(gameOver)
+    this.txtCommand.setText("GAME OVER");
+    else
     this.txtCommand.setText(command);
-    this.txtGameState.setText(gameState);
-    this.txtReturn.setText(returnValue);
+    
+    this.txtReturn.setText(Integer.toString(timeStep) );
+    this.txtScore.setText(Integer.toString(score) );
+    
+    
+    String Summary ="Sumary:\n"
+            + "NumOfGame: " + numOfGame
+            + "\nMaxScore: " + maxScore
+            + "\nMaxTime: " + maxTime;
+    
+    this.txtSumary.setText(Summary);
+    
+    
+    
+    if(!gameOver)
+        txtStatus.setText(runningString);
+    else 
+        txtStatus.setText(traninngString +"..."+percentTranning +"%]");
     this.validate();
     this.revalidate();
 

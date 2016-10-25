@@ -10,7 +10,7 @@ class Frame:
     
     frame_size_x = 30
     frame_size_y = 30
-    numberOfFrame  = 34
+    numberOfFrame  = 32
     
     def __init__(self,_frameName,_matrix):
         self.frameName = _frameName
@@ -58,11 +58,11 @@ class Frame:
         frames.append(Frame ("edibleTime",Frame.create_frame_edible_time(_gameState)))
         frameMatrix.append(Frame.create_frame_edible_time(_gameState))
         #1 CurrentLevel Level    32
-        frames.append(Frame ("currentLevel",Frame.create_frame_current_time(_gameState)))
-        frameMatrix.append(Frame.create_frame_current_time(_gameState))
+        #frames.append(Frame ("currentLevel",Frame.create_frame_current_time(_gameState)))
+        #frameMatrix.append(Frame.create_frame_current_time(_gameState))
         #1 Current Time    33
-        frames.append(Frame ("currentTime",Frame.create_frame_current_level(_gameState)))
-        frameMatrix.append(Frame.create_frame_current_level(_gameState))
+        #frames.append(Frame ("currentTime",Frame.create_frame_current_level(_gameState)))
+        #frameMatrix.append(Frame.create_frame_current_level(_gameState))
         
         frameMatrixReturn = np.stack(frameMatrix, axis = 2)
         

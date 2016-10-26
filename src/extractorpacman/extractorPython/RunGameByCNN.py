@@ -18,8 +18,8 @@ from collections import deque
 GAME = 'pacman' # the name of the game being played for log files
 ACTIONS = 4 # number of valid actions
 GAMMA = 0.99 # decay rate of past observations
-OBSERVE = 0 # timesteps to observe before training
-EXPLORE = 20 # frames over which to anneal epsilon
+OBSERVE = 19 # timesteps to observe before training
+EXPLORE = 19 # frames over which to anneal epsilon
 FINAL_EPSILON = 0.05 # final value of epsilon
 INITIAL_EPSILON = 1.0 # starting value of epsilon
 REPLAY_MEMORY = 590000 # number of previous transitions to remember
@@ -32,6 +32,7 @@ TRANING_TIME = 100
 SAVING_STEP =20
 LEARNING_RATE =0.00005
 SKIP_FRAME = 4
+NUM_OF_LEARNED_GAME = 5
 
 
 def weight_variable(shape):
@@ -115,12 +116,8 @@ def calculate_value_game_state(s, readout, h_fc1, sess, gameState):
     readout_t = readout.eval(feed_dict = {s : [s_t]})[0]
     
     action_index = np.argmax(readout_t)
-    
-    orderAction = sorted(range(len(action_index)),key=lambda x:action_index[x])
-    
-    
-    # print(readout_t)
-    return orderAction
+     
+    return action_index
 
 # END OF RUNING GAME
 
@@ -140,7 +137,7 @@ def tranning_network(s, readout, h_fc1, sess, gameState,train_step, socket,saver
     print("START OF TRAINING GAME %d th" %ithGame)   
      #first state
    
-    s_t = gameState[0]
+    s_t = Frame.get_input_network ( Parse.parse_game_state(gameState[0]))
     D = deque()
     print(len(gameState))
     # add all 10k gameState to Domain
@@ -149,6 +146,8 @@ def tranning_network(s, readout, h_fc1, sess, gameState,train_step, socket,saver
     lastAction  = MOVE.NEUTRAL
     oldScore =0
     for i in range(1, len(gameState)-1):
+        
+        
         
         #SET ACTION
         a_t = np.zeros([ACTIONS])
@@ -164,7 +163,7 @@ def tranning_network(s, readout, h_fc1, sess, gameState,train_step, socket,saver
                 lastAction = action_index
                 a_t[lastAction] =1
             
-            if (gameStateObjectNext.pillWasEaten  ):
+            if (gameStateObjectNext.pacmanWasEaten  ):
                 break
         
         
@@ -175,40 +174,50 @@ def tranning_network(s, readout, h_fc1, sess, gameState,train_step, socket,saver
         oldScore = gameStateObjectNext.score
         
         # SET NEXTSTATE
-        s_t1 = gameState[i+1]
+        s_t1 = Frame.get_input_network ( gameStateObjectNext)
         
         # if GAME OVER SET TERMINAL
-        terminal = gameStateObjectNext.pillWasEaten
+        terminal = gameStateObjectNext.pacmanWasEaten
         
         #ADD TO DOMAIN
         D.append((s_t, a_t, r_t, s_t1, terminal))
         
         # NEXT STATE IN SEQUENCE
-        s_t = s_t1
+        
+        if (terminal):
+            i = gameStateObjectNext.totalTime+1
+            if(i<len(gameState)-1):
+                s_t = Frame.get_input_network ( Parse.parse_game_state(gameState[i]))
+        else :
+            s_t= s_t1
+            
+        
          
         # if teminal, skip the next step
-        if(terminal):
-            i += 1
+        
     #training 1k times with BATCH size
     for i in range (0,TRANING_TIME):
-        #socket.send(("TRANNING %f" %(i*100.0/TRANING_TIME) +"\n").encode())     
+        socket.send(("TRANNING %f" %(i*100.0/TRANING_TIME) +"\n").encode())     
         minibatch = random.sample(list(D), BATCH)
-
+        
+        
+        
         # get the batch variablesi
         
-        list_s_j = [d[0] for d in minibatch]
-        s_j_batch = []
-        for state in list_s_j:
-            s_j_batch.append( Frame.get_input_network ( Parse.parse_game_state(state) )  )
+        #list_s_j = [d[0] for d in minibatch]
+        s_j_batch = [d[0] for d in minibatch]
+        
+        #for state in list_s_j:
+        #    s_j_batch.append( Frame.get_input_network ( Parse.parse_game_state(state) )  )
         
         
         a_batch = [d[1] for d in minibatch]
         r_batch = [d[2] for d in minibatch]
         
-        list_s_j1 = [d[3] for d in minibatch]
-        s_j1_batch = []
-        for state in list_s_j1:
-            s_j1_batch.append( Frame.get_input_network ( Parse.parse_game_state(state) )  )
+        #list_s_j1 = [d[3] for d in minibatch]
+        s_j1_batch = [d[3] for d in minibatch]
+        #for state in list_s_j1:
+        #    s_j1_batch.append( Frame.get_input_network ( Parse.parse_game_state(state) )  )
 
         y_batch = []
         
@@ -242,11 +251,11 @@ def supervised_learning(s, readout, h_fc1, sess, train_step, socket,saver):
     directory = 'LogGameFile'
 
     numOfLogGameFile = len([item for item in os.listdir(directory) if os.path.isfile(os.path.join(directory, item))])
-
+    #NUM_OF_LEARNED_GAME = numOfLogGameFile
     print("START OF TRAINING BY SUPERVISED NETWORK")
      #first state
      
-    for i in range (0,1):
+    for i in range (0,NUM_OF_LEARNED_GAME):
         
         nameLogFile =directory+"/F0000"[:-len(str(i))] + str(i)
         logFile = LogFile(nameLogFile)
@@ -312,9 +321,8 @@ numOfGame =0
 epsilon = INITIAL_EPSILON
 
 #SUPERVISEDLEARNING
-supervised_learning(input_layer, readout, h_fc1, sess, train_step,sock,saver)
+#supervised_learning(input_layer, readout, h_fc1, sess, train_step,sock,saver)
 
-numOfGame = 21
 
 while(terminator==False):
     gameState = sock.recv(port)
@@ -334,7 +342,8 @@ while(terminator==False):
         for line in logGame:
             target.write(line)
         target.close()
-        
+        # save game state
+         
         tranning_network(input_layer, readout, h_fc1, sess, logGame,train_step,sock,saver,numOfGame)
         command ="START_GAME"
         sock.send((command +"\n").encode())
@@ -357,7 +366,7 @@ while(terminator==False):
             action  = calculate_value_game_state(input_layer, readout, h_fc1, sess, gameStateX)
     
         #send back to java
-        sock.send(("%d" %(action) +"\n").encode())
+        sock.send(("%s" %(action) +"\n").encode())
 
 
 print("GAME_OVER")

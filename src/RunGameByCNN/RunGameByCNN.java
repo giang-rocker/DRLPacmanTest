@@ -11,6 +11,8 @@ import engine.pacman.game.Constants.MOVE;
 import engine.pacman.game.Game;
 import engine.pacman.game.GameView;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
@@ -47,19 +49,19 @@ public class RunGameByCNN {
         return nextMove;
     }
 
-    public static String getMoveString(int ret) {
+    public static String getMoveString(MOVE ret) {
         String stringMove = "";
         switch (ret) {
-            case 0:
+            case DOWN:
                 stringMove = "DOWN";
                 break;
-            case 1:
+            case LEFT:
                 stringMove = "LEFT";
                 break;
-            case 2:
+            case UP:
                 stringMove = "UP";
                 break;
-            case 3:
+            case RIGHT:
                 stringMove = "RIGHT";
                 break;
             default:
@@ -73,12 +75,13 @@ public class RunGameByCNN {
         int numOfGame = 0;
         int maxScore = 0;
         int maxTime = 0;
+        int bestRecord = 0;
         ServerSocket s = new ServerSocket(22009);//22009
         System.out.println("HOSTNAME: " + InetAddress.getLocalHost().getHostName());
 
         Socket ss;
-        //  FormRunCNN formRunCNN = new FormRunCNN();
-        //   formRunCNN.setVisible(true);
+        FormRunCNN formRunCNN = new FormRunCNN();
+        formRunCNN.setVisible(true);
         Game game = new Game(0);
         MOVE nextMove = MOVE.NEUTRAL;
         String stringMove = "";
@@ -108,15 +111,34 @@ public class RunGameByCNN {
 
             if (command.indexOf("TRANNING") != -1) {
                 percentTranning = Float.parseFloat(command.substring(("TRANNING").length()));
-                //    formRunCNN.setValue(stringMove, game.getTotalTime(), game.getScore(), numOfGame, maxScore, maxTime, true, percentTranning);
+                formRunCNN.setValue(stringMove, game.getTotalTime(), game.getScore(), numOfGame, bestRecord, maxScore, maxTime, true, percentTranning);
                 continue;
             } else if (command.equals("START_GAME")) {
                 if (game.getScore() > maxScore) {
                     maxScore = game.getScore();
-                }
-                if (game.getTotalTime() > maxTime) {
                     maxTime = game.getTotalTime();
+                    bestRecord = numOfGame;
                 }
+
+                BufferedWriter bw = null;
+
+                try {
+                    bw = new BufferedWriter(new FileWriter("LogRecord.txt", true));
+                    bw.write(numOfGame + "," + String.valueOf(game.getScore()));
+                    bw.newLine();
+                    bw.flush();
+                } catch (IOException ioe) {
+                    ioe.printStackTrace();
+                } finally { // always close the file
+                    if (bw != null) {
+                        try {
+                            bw.close();
+                        } catch (IOException ioe2) {
+                            // just ignore it
+                        }
+                    }
+                }
+
                 numOfGame++;
                 game = new Game(0);
 
@@ -127,36 +149,13 @@ public class RunGameByCNN {
                 // convert to int
                 int ret = Integer.parseInt(command);
 
-                // for sure becase max is 4
-                // get valid move by ID
-                if (ret > 5) {
-                    int actionIndex = -1;
-                    for (int i = 0; i < 4; i++) {
-                        actionIndex = ret % 10;
-                        MOVE tempMove = getMove(actionIndex);
-
-                        if (game.getNeighbour(game.getPacmanCurrentNodeIndex(), tempMove) != -1) {
-                            nextMove = tempMove;
-                            break;
-                        }
-
-                        ret /= 10;
-                    }
-
-                }
-                else { // return random move
-                
-                    nextMove = getMove(ret);
-                
-                }
+                nextMove = getMove(ret);
+                stringMove = getMoveString(nextMove);
 
                 // convert to MOVE
                 // advance
                 // wrong move
-                if (game.getNeighbour(game.getPacmanCurrentNodeIndex(), nextMove) == -1) {
-                    pw.println("WRONG");
-                    wrongMove = true;
-                } else {
+                {
                     // simulate ghost move
                     Game simulatedGame = game.copy(false);
                     SimulateGhostMove ghostsMove = new SimulateGhostMove();
@@ -179,7 +178,7 @@ public class RunGameByCNN {
                 }
             }
 
-            //   formRunCNN.setValue(stringMove, game.getTotalTime(), game.getScore(), numOfGame, maxScore, maxTime, game.gameOver(), percentTranning);
+            formRunCNN.setValue(stringMove, game.getTotalTime(), game.getScore(), numOfGame, bestRecord, maxScore, maxTime, game.gameOver(), percentTranning);
         }
 
     }

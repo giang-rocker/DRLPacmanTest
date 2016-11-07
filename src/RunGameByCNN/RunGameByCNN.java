@@ -20,6 +20,7 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.EnumMap;
+import java.util.Random;
 
 /**
  *
@@ -74,20 +75,20 @@ public class RunGameByCNN {
     public static void main(String[] args) throws IOException {
         int numOfGame = 0;
         int maxScore = 0;
+        int maxLevel=0;
         int maxTime = 0;
         int bestRecord = 0;
         ServerSocket s = new ServerSocket(22009);//22009
         System.out.println("HOSTNAME: " + InetAddress.getLocalHost().getHostName());
 
         Socket ss;
-        FormRunCNN formRunCNN = new FormRunCNN();
-        formRunCNN.setVisible(true);
+       // FormRunCNN formRunCNN = new FormRunCNN();
+       // formRunCNN.setVisible(true);
         Game game = new Game(0);
         MOVE nextMove = MOVE.NEUTRAL;
-        String stringMove = "";
+       // String stringMove = "";
         boolean visual = true;
-        boolean wrongMove = false;
-
+        
         float percentTranning = 0;
 
         PrintWriter pw;
@@ -103,21 +104,22 @@ public class RunGameByCNN {
         }
 
         while (true) {
-            wrongMove = false;
+          
             outToPython = new BufferedReader(new InputStreamReader(System.in));
             inFromPython = new BufferedReader(new InputStreamReader(ss.getInputStream()));
             int timeStep = 0;
             String command = inFromPython.readLine();
 
             if (command.indexOf("TRANNING") != -1) {
-                percentTranning = Float.parseFloat(command.substring(("TRANNING").length()));
-                formRunCNN.setValue(stringMove, game.getTotalTime(), game.getScore(), numOfGame, bestRecord, maxScore, maxTime, true, percentTranning);
+            //    percentTranning = Float.parseFloat(command.substring(("TRANNING").length()));
+              //  formRunCNN.setValue(stringMove, game.getTotalTime(), game.getScore(), numOfGame, bestRecord, maxScore, maxTime,maxLevel, true, percentTranning);
                 continue;
             } else if (command.equals("START_GAME")) {
                 if (game.getScore() > maxScore) {
                     maxScore = game.getScore();
                     maxTime = game.getTotalTime();
                     bestRecord = numOfGame;
+                    maxLevel = game.getCurrentLevel();
                 }
 
                 BufferedWriter bw = null;
@@ -143,26 +145,46 @@ public class RunGameByCNN {
                 game = new Game(0);
 
             } else {
-
-                // if not start game, it should be a move for current Game
-                String moveString = command;
+                 String moveString="";
+                // if RANDOM
+                if (command.equals("RANDOM")) {
+                  Random R = new Random();
+                  
+                  MOVE[] listPosMove = game.getPossibleMoves(game.getPacmanCurrentNodeIndex(), game.getPacmanLastMoveMade());
+                  nextMove = listPosMove[R.nextInt(listPosMove.length)];  
+            //      moveString = nextMove.toString();
+                  
+                }
+                else{                
+              //  moveString = command;
                 // convert to int
                 int ret = Integer.parseInt(command);
-
                 nextMove = getMove(ret);
-                stringMove = getMoveString(nextMove);
+                }
+                
+                // check valid move
+                if ( game.getNeighbour(game.getPacmanCurrentNodeIndex(), nextMove) ==-1)
+                    if ( game.getNeighbour(game.getPacmanCurrentNodeIndex(), game.getPacmanLastMoveMade()) !=-1)
+                    nextMove = game.getPacmanLastMoveMade();
+                    else {
+                         Random R = new Random();
+                         MOVE [] listPossibleMove = game.getPossibleMoves(game.getPacmanCurrentNodeIndex(), game.getPacmanLastMoveMade());
+                        nextMove = listPossibleMove[  R.nextInt(listPossibleMove.length)  ];                         
+                                }
+                 
+                // first move should be random left and right
+                
+                    
+              //  stringMove = getMoveString(nextMove);
 
-                // convert to MOVE
-                // advance
-                // wrong move
                 {
                     // simulate ghost move
-                    Game simulatedGame = game.copy(false);
-                    SimulateGhostMove ghostsMove = new SimulateGhostMove();
-                    EnumMap<Constants.GHOST, MOVE> listGhostMove = new EnumMap<>(Constants.GHOST.class);
-                    listGhostMove = ghostsMove.getMove(simulatedGame);
-                    timeStep++;
-                    game.advanceGame(nextMove, listGhostMove);
+                   // Game simulatedGame = game.copy(false);
+                    //SimulateGhostMove ghostsMove = new SimulateGhostMove();
+                    //EnumMap<Constants.GHOST, MOVE> listGhostMove = new EnumMap<>(Constants.GHOST.class);
+                   // listGhostMove = ghostsMove.getMove(simulatedGame);
+                   // timeStep++;
+                    game.advanceGameGhostNoMove(nextMove);
                 }
 
             }
@@ -170,15 +192,15 @@ public class RunGameByCNN {
             // write game state to python
             if (command.indexOf("TRANNING") == -1) {
                 if (game.gameOver()) {
-                    pw.println("GAME_OVER" + game.getScore());
+                    pw.println("GAME_OVER - Score :" + game.getScore() + " T: " + game.getTotalTime() +" L: "+ game.getCurrentLevel());
 
-                } else if (!wrongMove) {
+                } else  {
 
                     pw.println(game.getGameState());
                 }
             }
 
-            formRunCNN.setValue(stringMove, game.getTotalTime(), game.getScore(), numOfGame, bestRecord, maxScore, maxTime, game.gameOver(), percentTranning);
+         //   formRunCNN.setValue(stringMove, game.getTotalTime(), game.getScore(), numOfGame, bestRecord, maxScore, maxTime, maxLevel, game.gameOver(), percentTranning);
         }
 
     }

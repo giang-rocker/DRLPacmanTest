@@ -512,6 +512,14 @@ public final class Game {
         updateGhosts(ghostMoves);
         updateGame();
     }
+    
+    public void advanceGameGhostNoMove(MOVE pacManMove) {
+        if (!canBeForwarded()) return;
+        updatePacMan(pacManMove);
+      //  updateGhosts(ghostMoves);
+        updateGame();
+    }
+
 
     public void advanceGameWithoutReverse(MOVE pacManMove, EnumMap<GHOST, MOVE> ghostMoves) {
         if (!canBeForwarded()) return;

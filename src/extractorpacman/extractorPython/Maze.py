@@ -106,7 +106,7 @@ class GameState:
         self.print_list_ghost()
         self.print_pill_status()
         self.print_power_pill_status()
-        
+            
         print ("timeOfLastGlobalReversal: %d" %self.timeOfLastGlobalReversal)
         print ("pacmanWasEaten: %s" %self.pacmanWasEaten)
         print ("pillWasEaten: %s" %self.pillWasEaten)

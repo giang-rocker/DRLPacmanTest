@@ -10,11 +10,12 @@ class Frame:
     
     frame_size_x = 30
     frame_size_y = 30
-    numberOfFrame  = 32
+    numberOfFrame  = 30
     
     def __init__(self,_frameName,_matrix):
         self.frameName = _frameName
         self.matrix = _matrix
+         
     
     @staticmethod
     def get_input_network(_gameState):
@@ -37,7 +38,7 @@ class Frame:
 
         #5 frame of pacman last Move  [12-16]
         framePacman = Frame.create_frame_paman_lastMove(_gameState)
-        for i in range (0,5):
+        for i in range (0,4):
             frames.append( Frame("PacmanLastMove", framePacman[i]))
             frameMatrix.append(framePacman[i])
         
@@ -50,7 +51,7 @@ class Frame:
 
         #5 frame of pacman last Move  [26-30]
         framePacman = Frame.create_frame_ghost_lastMove(_gameState)
-        for i in range (0,5):
+        for i in range (0,4):
             frames.append( Frame("GhostLastMove", framePacman[i])) 
             frameMatrix.append(framePacman[i])
         
@@ -67,6 +68,8 @@ class Frame:
         frameMatrixReturn = np.stack(frameMatrix, axis = 2)
         
         return frameMatrixReturn
+    
+        
         
     @staticmethod
     def create_frame_path(_gameState):
@@ -86,7 +89,7 @@ class Frame:
         framePill =[[0 for x in range(Frame.frame_size_y)] for y in range(Frame.frame_size_x)] 
         
         for  i in range (0, _gameState.maze.numberOfPill):
-            if (_gameState.listPillStatus[i]==True) and (_gameState.maze.listPill[i].y %4 ==0 ) and (_gameState.maze.listPill[i].x %4==0 ):
+            if (_gameState.listPillStatus[i]==True) :
                 
                 x = int(_gameState.maze.listPill[i].y / 4)
                 y = int(_gameState.maze.listPill[i].x  / 4)
@@ -100,7 +103,7 @@ class Frame:
         framePowerPill =[[0 for x in range(Frame.frame_size_y)] for y in range(Frame.frame_size_x)] 
         
         for  i in range (0, _gameState.maze.numberOfPowerPill):
-            if (_gameState.maze.listPowerPill[i].y %4 ==0 ) and (_gameState.maze.listPowerPill[i].x %4==0 ):
+            if (_gameState.listPowerPillStatus[i]==True) :
                 x = int(_gameState.maze.listPowerPill[i].y / 4)
                 y = int(_gameState.maze.listPowerPill[i].x  / 4)
                   
@@ -125,14 +128,14 @@ class Frame:
              
     @staticmethod
     def create_frame_paman_lastMove(_gameState):
-        framePacMan =[[[0 for col in range(Frame.frame_size_y)]for row in range(Frame.frame_size_x)] for x in range(5)]
+        framePacMan =[[[0 for col in range(Frame.frame_size_y)]for row in range(Frame.frame_size_x)] for x in range(4)]
         
         x = int(_gameState.maze.listNode[_gameState.pacman.currentNodeIndex].y / 4)
         y = int(_gameState.maze.listNode[_gameState.pacman.currentNodeIndex].x  / 4)
         
         
         move = _gameState.pacman.lastMoveMade
-        framePacMan[move%5][x][y] = 1;
+        framePacMan[move%4][x][y] = 1;
         return framePacMan
     
     @staticmethod
@@ -161,7 +164,7 @@ class Frame:
              
     @staticmethod
     def create_frame_ghost_lastMove(_gameState):
-        frameGhost =[[[0 for col in range(Frame.frame_size_y)]for row in range(Frame.frame_size_x)] for x in range(5)]
+        frameGhost =[[[0 for col in range(Frame.frame_size_y)]for row in range(Frame.frame_size_x)] for x in range(4)]
         
         for i in range (0,4):
             x = int(_gameState.maze.listNode[_gameState.ghosts[i].currentNodeIndex].y / 4)
@@ -170,7 +173,7 @@ class Frame:
             move = _gameState.ghosts[i].lastMoveMade
             #print("%s  " %MOVE.get_move(move))
             
-            frameGhost[move%5][x][y] = 1;
+            frameGhost[move%4][x][y] = 1;
             
         return frameGhost
     

@@ -192,7 +192,7 @@ public class FormRunCNN extends javax.swing.JFrame {
  static int count = 0;   
  String runningString = "[status: running ...]";
   String traninngString = "[status: tranning ...";
-public void setValue (String command, int timeStep, int score, int numOfGame,int bestRecord, int maxScore, int maxTime, boolean gameOver,float percentTranning){
+public void setValue (String command, int timeStep, int score, int numOfGame,int bestRecord, int maxScore, int maxTime,  int maxLevel,boolean gameOver,float percentTranning){
     if(gameOver)
     this.txtCommand.setText("GAME OVER");
     else
@@ -206,6 +206,7 @@ public void setValue (String command, int timeStep, int score, int numOfGame,int
             + "NumOfGame: " + numOfGame
             + "\nBest Record: " + bestRecord
             + "\nMaxScore: " + maxScore
+            + "\nLevel: " + maxLevel
             + "\nTime: " + maxTime;
     
     this.txtSumary.setText(Summary);

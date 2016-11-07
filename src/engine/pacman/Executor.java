@@ -356,6 +356,40 @@ public class Executor {
         ghostController.terminate();
     }
     
+     public void runGameGhostNoMove(Controller<MOVE> pacManController, boolean visual) {
+        Game game = (this.ghostsMessage) ? new Game(0, messenger.copy()) : new Game(0);
+
+        GameView gv = null;
+
+        if (visual){
+            gv = new GameView(game).showGame();
+            
+        }
+        if (pacManController instanceof HumanController)
+            gv.getFrame().addKeyListener(((HumanController) pacManController).getKeyboardInput());
+
+        new Thread(pacManController).start();
+    
+
+        while (!game.gameOver()) {
+            pacManController.update(game.copy((pacmanPO) ? GHOST.values().length + 1 : -1), System.currentTimeMillis() + 5);
+         
+            try {
+                Thread.sleep(5);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            game.advanceGameGhostNoMove(pacManController.getMove());
+
+            if (visual)
+                gv.repaint();
+        }
+
+        pacManController.terminate();
+       
+    }
+    
     public void runGamePO(Controller<MOVE> pacManController, Controller<EnumMap<GHOST, MOVE>> ghostController, boolean visual) {
         Game game = (this.ghostsMessage) ? new Game(0, messenger.copy()) : new Game(0);
 

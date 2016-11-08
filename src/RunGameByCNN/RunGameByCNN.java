@@ -163,15 +163,13 @@ public class RunGameByCNN {
                 }
                 
                 // check valid move
+                // not allow wrong move
                 if ( game.getNeighbour(game.getPacmanCurrentNodeIndex(), nextMove) ==-1)
-                    if ( game.getNeighbour(game.getPacmanCurrentNodeIndex(), game.getPacmanLastMoveMade()) !=-1)
-                    nextMove = game.getPacmanLastMoveMade();
-                    else {
-                         Random R = new Random();
-                         MOVE [] listPossibleMove = game.getPossibleMoves(game.getPacmanCurrentNodeIndex(), game.getPacmanLastMoveMade());
-                        nextMove = listPossibleMove[  R.nextInt(listPossibleMove.length)  ];                         
-                                }
-                 
+                {
+                    game.gameOver = true;
+                    game.pacmanWasEaten = true;
+                }
+                    
                 // first move should be random left and right
                 
                     

@@ -18,8 +18,8 @@ from collections import deque
 GAME = 'pacman' # the name of the game being played for log files
 ACTIONS = 4 # number of valid actions
 GAMMA = 0.99 # decay rate of past observations
-OBSERVE = 100 # timesteps to observe before traini ng
-EXPLORE = 100 # frames over which to anneal epsilon
+OBSERVE = 30 # timesteps to observe before traini ng
+EXPLORE = 30 # frames over which to anneal epsilon
 FINAL_EPSILON = 0.05 # final value of epsilon
 INITIAL_EPSILON = 1 # starting value of epsilon
 REPLAY_MEMORY = 590000 # number of previous transitions to remember
@@ -132,8 +132,6 @@ def tranning_network(s, readout, h_fc1, sess, gameState,train_step, socket,saver
     print("START OF TRAINING GAME %d th" %ithGame)   
      #first state
    
-    gameStateObjectCurrent =Parse.parse_game_state(gameState[0])
-    s_t = Frame.get_input_network ( gameStateObjectCurrent)
     D = deque()
     print(len(gameState))
     # add all 10k gameState to Domain
@@ -141,7 +139,7 @@ def tranning_network(s, readout, h_fc1, sess, gameState,train_step, socket,saver
     lastValidMove = MOVE.LEFT
     lastAction  = MOVE.NEUTRAL
     oldScore =0
-    lenX =  len(gameState)-1
+    lenX =  len(gameState)
     originalObject =[]
     originalFrame =[]
     
@@ -149,12 +147,16 @@ def tranning_network(s, readout, h_fc1, sess, gameState,train_step, socket,saver
     for i in range(lenX):
         originalObject.append(Parse.parse_game_state(gameState[i]))
         originalFrame.append( Frame.get_input_network ( originalObject[i]))
-         
+    
+    originalObject.append(Parse.parse_game_state(gameState[lenX-1]))
+    originalObject[lenX].pacmanWasEaten="True"
+    originalFrame.append( Frame.get_input_network ( originalObject[lenX]))      
+    lenX+=1
+    
     #add to domain
-    for i in range(lenX-1):
-        
+    i = 0
+    while(i < (lenX-1)):
         s_t = originalFrame[i]
-            
         #SET ACTION
         a_t = np.zeros([ACTIONS])
         action_index = originalObject[i+1].pacman.lastMoveMade
@@ -165,32 +167,32 @@ def tranning_network(s, readout, h_fc1, sess, gameState,train_step, socket,saver
             lastValidMove= action_index
 
         a_t[action_index] = 1
-        
+
         terminal = False
-        
-        if ((i+SKIP_FRAME )< lenX):
+
+        if ((i+SKIP_FRAME )< lenX-1):
             nextFrame = i+SKIP_FRAME 
         else :
              nextFrame = lenX-1
-            
+
         s_t1 = originalFrame[nextFrame]
         if ( originalObject[nextFrame].pacmanWasEaten == "True" ):
             terminal = True
-            
+
         r_t = originalObject[nextFrame].score - oldScore
         oldScore = originalObject[nextFrame].score
         D.append((s_t, a_t, r_t, s_t1, terminal))
-        
-                
+
+
         if(terminal==True):
-            i = i+SKIP_FRAME+1
-        
+           i = nextFrame
+        i+=1
             
-       
+    currentBatch = min(len(D),BATCH)   
     #training 1k times with BATCH size
     for i in range (0,TRANING_TIME):
         socket.send(("TRANNING %.2f" %(i*100.0/TRANING_TIME) +"\n").encode())     
-        minibatch = random.sample(list(D), BATCH)
+        minibatch = random.sample(list(D), currentBatch)
         
         
         
@@ -287,7 +289,7 @@ a = tf.placeholder("float", [None, ACTIONS])
 y = tf.placeholder("float", [None])
 readout_action = tf.reduce_sum(tf.mul(readout, a), reduction_indices = 1)    
 cost = tf.reduce_mean(tf.square(y - readout_action))
-train_step = tf.train.AdamOptimizer(LEARNING_RATE).minimize(cost)
+train_step = tf.train.GradientDescentOptimizer(LEARNING_RATE).minimize(cost)
 saver = tf.train.Saver()
 
 

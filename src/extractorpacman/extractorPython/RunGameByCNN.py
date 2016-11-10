@@ -1,6 +1,6 @@
 #currently following FullPingPong.py
 import sys
-from tkinter import *
+
 from Parse import Parse
 from LogFile import LogFile
 from Frame import Frame

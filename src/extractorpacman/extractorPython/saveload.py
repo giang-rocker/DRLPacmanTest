@@ -14,24 +14,25 @@ import tensorflow as tf
 import sys
 import random
 import numpy as np
-
 GAME = 'pacman' # the name of the game being played for log files
 ACTIONS = 4 # number of valid actions
 GAMMA = 0.99 # decay rate of past observations
-OBSERVE = 20 # timesteps to observe before training
-EXPLORE = 20 # frames over which to anneal epsilon
+OBSERVE = 40000 # timesteps to observe before traini ng
+EXPLORE = 40000 # frames over which to anneal epsilon
 FINAL_EPSILON = 0.05 # final value of epsilon
-INITIAL_EPSILON = 1.0 # starting value of epsilon
-REPLAY_MEMORY = 590000 # number of previous transitions to remember
-BATCH = 100 # size of minibatch
+INITIAL_EPSILON = 1 # starting value of epsilon
+REPLAY_MEMORY = 50000 # number of previous transitions to remember
+BATCH = 32 # size of minibatch
 K = 1 # only select an action every Kth frame, repeat prev for others
 SIZEX = 30
 SIZEY=30
-NUM_OF_FRAME = 32
+NUM_OF_FRAME = 31
 TRANING_TIME = 100
 SAVING_STEP =20
-LEARNING_RATE =0.00005
-SKIP_FRAME = 4
+LEARNING_RATE =0.0025
+SKIP_FRAME = 1
+NUM_OF_LEARNED_GAME = 10
+TRANING_CURRENT_TIME = 1
 
 
 def weight_variable(shape):
@@ -39,7 +40,7 @@ def weight_variable(shape):
     return tf.Variable(initial)
 
 def bias_variable(shape):
-    initial = tf.constant(0.1, shape = shape)
+    initial = tf.constant(0.001, shape = shape)
     return tf.Variable(initial)
 
 def conv2d(x, W, stride):
@@ -53,47 +54,47 @@ def createNetwork():
     # size of filter X, Y , number of input, number of output
     W_conv1 = weight_variable([5, 5, NUM_OF_FRAME, 64])
     # number of output
-    #b_conv1 = bias_variable([64])
+    b_conv1 = bias_variable([64])
 
     W_conv2 = weight_variable([3, 3, 64, 64])
-    #b_conv2 = bias_variable([64])
+    b_conv2 = bias_variable([64])
 
     W_conv3 = weight_variable([2, 2, 64, 64])
-    #b_conv3 = bias_variable([64])
+    b_conv3 = bias_variable([64])
     
     W_conv4 = weight_variable([2, 2, 64, 64])
-    #b_conv4 = bias_variable([64])
+    b_conv4 = bias_variable([64])
 
     W_fc1 = weight_variable([256, 512])
-    #b_fc1 = bias_variable([512])
+    b_fc1 = bias_variable([512])
 
     W_fc2 = weight_variable([512, ACTIONS])
-    #b_fc2 = bias_variable([ACTIONS])
+    b_fc2 = bias_variable([ACTIONS])
 
     # INPUT LAYER
-    input_layer = tf.placeholder("float", [None, SIZEX, SIZEY, NUM_OF_FRAME])
+    input_layer = tf.placeholder("float", [1,SIZEX, SIZEY, NUM_OF_FRAME])
 
     # hidden layers
-    h_conv1 = tf.nn.relu(conv2d(input_layer, W_conv1, 1))# + b_conv1)
+    h_conv1 = tf.nn.relu(conv2d(input_layer, W_conv1, 1) + b_conv1)
     h_pool1 = max_pool_2x2(h_conv1)
 
-    h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2, 1))# + b_conv2)
+    h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2, 1) + b_conv2)
     h_pool2 = max_pool_2x2(h_conv2)
 
-    h_conv3 = tf.nn.relu(conv2d(h_pool2, W_conv3, 1))# + b_conv3)
+    h_conv3 = tf.nn.relu(conv2d(h_pool2, W_conv3, 1) + b_conv3)
     h_pool3 = max_pool_2x2(h_conv3)
     
-    h_conv4 = tf.nn.relu(conv2d(h_pool3, W_conv4, 1))# + b_conv4)
+    h_conv4 = tf.nn.relu(conv2d(h_pool3, W_conv4, 1) + b_conv4)
     h_pool4 = max_pool_2x2(h_conv4)
 
     h_pool4_flat = tf.reshape(h_pool4, [-1, 256])
     # 1600 how many sate ?
     #h_conv3_flat = tf.reshape(h_conv3, [-1, 256])
 
-    h_fc1 = tf.nn.relu(tf.matmul(h_pool4_flat, W_fc1))# + b_fc1)
+    h_fc1 = tf.nn.relu(tf.matmul(h_pool4_flat, W_fc1) + b_fc1)
 
     # readout layer
-    readout = tf.matmul(h_fc1, W_fc2)# + b_fc2
+    readout = tf.matmul(h_fc1, W_fc2) + b_fc2
     
     #print(h_pool3.get_shape())
     return input_layer, readout, h_fc1
@@ -101,20 +102,25 @@ def createNetwork():
 
 
 
-
-def calculate_value_game_state(s, readout, h_fc1, sess, gameState):
-    
+def calculate_value_game_state(input_layer, readout, h_fc1, sess, gameState):
     
     gameObject = Parse.parse_game_state(gameState)
-    
-    #print("AT Game Step: %d Score %d" %(gameObject.totalTime, gameObject.score))
-
-    
     s_t=Frame.get_input_network(gameObject)
-     
-    readout_t = readout.eval(feed_dict = {s : [s_t]})[0]
+    
+    print(s_t.shape)
+    
+    print(len(s_t))
+    for st in s_t[3]:
+        print (st.shape)
+        #print(st)
+    
+    print(len(s_t))
+    readout_t = readout.eval(feed_dict = {input_layer : [s_t]})[0]
     action_index = np.argmax(readout_t)
     
+   
+    
+    print("State" + str(gameObject.totalTime))
     print(readout_t)
     return action_index
 
@@ -140,14 +146,15 @@ input_layer, readout, h_fc1 = createNetwork()
 
 # MORE VARIABLE
 saver = tf.train.Saver()
+gameState=[]
+gameState.append("0,44,100,44,0,934,LEFT,3,false,498,0,0,NEUTRAL,1292,0,16,NEUTRAL,1292,0,36,NEUTRAL,1292,0,56,NEUTRAL,1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111110000000000111111111111111111111111111111111111111111111111111111111111111111111111,1111,-1,false,false,false,false,false,false,false")
+#gameState.append("0,45,100,45,0,933,LEFT,3,false,498,0,0,NEUTRAL,1292,0,15,NEUTRAL,1292,0,35,NEUTRAL,1292,0,55,NEUTRAL,1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111110000000000111111111111111111111111111111111111111111111111111111111111111111111111,1111,-1,false,false,false,false,false,false,false")
+#gameState.append("0,46,110,46,0,932,LEFT,3,false,498,0,0,NEUTRAL,1292,0,14,NEUTRAL,1292,0,34,NEUTRAL,1292,0,54,NEUTRAL,1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111100000000000111111111111111111111111111111111111111111111111111111111111111111111111,1111,-1,false,false,false,false,false,true,false")
+#gameState.append("0,48,110,48,0,930,LEFT,3,false,498,0,0,NEUTRAL,1292,0,12,NEUTRAL,1292,0,32,NEUTRAL,1292,0,52,NEUTRAL,1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111100000000000111111111111111111111111111111111111111111111111111111111111111111111111,1111,-1,false,false,false,false,false,false,false")
 
-gameState="3,8674,21280,1705,3,226,LEFT,3,true,218,47,0,RIGHT,1129,47,0,RIGHT,440,47,0,DOWN,167,47,0,DOWN,000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000111000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000,0000,8576,false,false,false,false,false,false,false"
 
 sess.run(tf.initialize_all_variables())
-print("BEFORE LOAD NET")
-calculate_value_game_state(input_layer, readout, h_fc1, sess, gameState)
 
-''' 
 checkpoint = tf.train.get_checkpoint_state("saved_networks")
 if checkpoint and checkpoint.model_checkpoint_path:
     saver.restore(sess, checkpoint.model_checkpoint_path)
@@ -157,9 +164,10 @@ else:
 
 
 print("AFTER LOAD NET")
-calculate_value_game_state(input_layer, readout, h_fc1, sess, gameState)
+for gt in gameState:
+    calculate_value_game_state(input_layer, readout, h_fc1, sess, gt)
 
-'''
+
 
 print("GAME_OVER")
 

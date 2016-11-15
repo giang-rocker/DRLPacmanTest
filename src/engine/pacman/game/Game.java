@@ -80,11 +80,11 @@ public final class Game {
     //pills stored as bitsets for efficient copying
     private BitSet pills, powerPills;
     //all the game's variables
-    private int mazeIndex, levelCount, currentLevelTime, totalTime, score, ghostEatMultiplier, timeOfLastGlobalReversal;
+    public int mazeIndex, levelCount, currentLevelTime, totalTime, score, ghostEatMultiplier, timeOfLastGlobalReversal;
     public boolean gameOver, pacmanWasEaten, pillWasEaten, powerPillWasEaten;
     private EnumMap<GHOST, Boolean> ghostsEaten;
     //the data relating to pacman and the ghosts are stored in respective data structures for clarity
-    private PacMan pacman;
+    public PacMan pacman;
     private EnumMap<GHOST, Ghost> ghosts;
     // PO State
     private boolean po;

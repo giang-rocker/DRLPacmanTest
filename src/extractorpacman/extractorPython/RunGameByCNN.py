@@ -17,22 +17,24 @@ from collections import deque
 
 GAME = 'pacman' # the name of the game being played for log files
 ACTIONS = 4 # number of valid actions
-GAMMA = 0.99 # decay rate of past observations
-OBSERVE = 10000 # timesteps to observe before traini ng
-EXPLORE = 10000 # frames over which to anneal epsilon
+GAMMA = 0.95 # decay rate of past observations
+OBSERVE = 500000 # timesteps to observe before traini ng
+EXPLORE = 500000 # frames over which to anneal epsilon
 FINAL_EPSILON = 0.05 # final value of epsilon
 INITIAL_EPSILON = 1 # starting value of epsilon
-REPLAY_MEMORY = 24000 # number of previous transitions to remember
-BATCH = 30 # size of minibatch
+REPLAY_MEMORY = 30000 # number of previous transitions to remember
+REPLAY_CURRENT_MEMORY = 4000 # last 4k step of current game
+BATCH = 32 # size of minibatch
 K = 1 # only select an action every Kth frame, repeat prev for others
 SIZEX = 30
 SIZEY=30
 NUM_OF_FRAME = 30
-TRANING_TIME = 300
+TRANING_TIME = 100
 SAVING_STEP =20
-LEARNING_RATE =0.00025
-SKIP_FRAME = 4
+LEARNING_RATE =0.0005
+SKIP_FRAME = 1
 NUM_OF_LEARNED_GAME = 10
+TRANING_CURRENT_TIME = 1
 
 
 def weight_variable(shape):
@@ -40,7 +42,7 @@ def weight_variable(shape):
     return tf.Variable(initial)
 
 def bias_variable(shape):
-    initial = tf.constant(0.00001, shape = shape)
+    initial = tf.constant(0.001, shape = shape)
     return tf.Variable(initial)
 
 def conv2d(x, W, stride):
@@ -50,10 +52,7 @@ def max_pool_2x2(x):
     return tf.nn.max_pool(x, ksize = [1, 2, 2, 1], strides = [1, 2, 2, 1], padding = "SAME")
 
 def createNetwork():
-    # network weights
-    # size of filter X, Y , number of input, number of output
     W_conv1 = weight_variable([5, 5, NUM_OF_FRAME, 64])
-    # number of output
     b_conv1 = bias_variable([64])
 
     W_conv2 = weight_variable([3, 3, 64, 64])
@@ -64,8 +63,9 @@ def createNetwork():
     
     W_conv4 = weight_variable([2, 2, 64, 64])
     b_conv4 = bias_variable([64])
-
-    W_fc1 = weight_variable([256, 512])
+    
+    W_fc1 = weight_variable([4096, 512])
+    #W_fc1 = weight_variable([256, 512])
     b_fc1 = bias_variable([512])
 
     W_fc2 = weight_variable([512, ACTIONS])
@@ -82,15 +82,16 @@ def createNetwork():
     h_pool2 = max_pool_2x2(h_conv2)
 
     h_conv3 = tf.nn.relu(conv2d(h_pool2, W_conv3, 1) + b_conv3)
-    h_pool3 = max_pool_2x2(h_conv3)
+    #h_pool3 = max_pool_2x2(h_conv3)
     
-    h_conv4 = tf.nn.relu(conv2d(h_pool3, W_conv4, 1) + b_conv4)
-    h_pool4 = max_pool_2x2(h_conv4)
+    #h_conv4 = tf.nn.relu(conv2d(h_pool3, W_conv4, 1) + b_conv4)
+    h_conv4 = tf.nn.relu(conv2d(h_conv3, W_conv4, 1) + b_conv4)
+    #h_pool4 = max_pool_2x2(h_conv4)
 
-    h_pool4_flat = tf.reshape(h_pool4, [-1, 256])
-    # 1600 how many sate ?
-    #h_conv3_flat = tf.reshape(h_conv3, [-1, 256])
-
+    h_pool4_flat = tf.reshape(h_conv4, [-1,  4096])
+    #h_pool4_flat = tf.reshape(h_pool4, [-1, 256])
+    
+    
     h_fc1 = tf.nn.relu(tf.matmul(h_pool4_flat, W_fc1) + b_fc1)
 
     # readout layer
@@ -102,8 +103,7 @@ def createNetwork():
 
 
 
-
-def calculate_value_game_state(s, readout, h_fc1, sess, gameState):
+def calculate_value_game_state(input_layer, readout, h_fc1, sess, gameState):
     
     
     gameObject = Parse.parse_game_state(gameState)
@@ -113,7 +113,7 @@ def calculate_value_game_state(s, readout, h_fc1, sess, gameState):
     
     s_t=Frame.get_input_network(gameObject)
      
-    readout_t = readout.eval(feed_dict = {s : [s_t]})[0]
+    readout_t = readout.eval(feed_dict = {input_layer : [s_t]})[0]
     
     action_index = np.argmax(readout_t)
      
@@ -211,7 +211,7 @@ def tranning_network(s, readout, h_fc1, sess, gameState,train_step, socket,saver
 
         y_batch = []
         
-        readout_j1_batch = readout.eval(feed_dict = {s : s_j1_batch})
+        readout_j1_batch = readout.eval(feed_dict = {input_layer : s_j1_batch})
         
         for k in range(0, len(minibatch)):
             # if terminal only equals reward
@@ -282,7 +282,7 @@ a = tf.placeholder("float", [None, ACTIONS])
 y = tf.placeholder("float", [None])
 readout_action = tf.reduce_sum(tf.mul(readout, a), reduction_indices = 1)    
 cost = tf.reduce_mean(tf.square(y - readout_action))
-train_step = tf.train.GradientDescentOptimizer(LEARNING_RATE).minimize(cost)
+train_step = tf.train.AdamOptimizer(LEARNING_RATE).minimize(cost)
 saver = tf.train.Saver()
 
 
@@ -308,6 +308,7 @@ logGame=[]
 logMove =[]
 numOfGame =0
 epsilon = INITIAL_EPSILON
+totalTimeStep  =0
 
 
 #LOAD NETWORK INCASE ALREADY LEARNING
@@ -328,86 +329,135 @@ while(terminator==False):
     gameState = sock.recv(port)
     
     #GAME_OVER
-    if(len(gameState)<40):
+    if(len(gameState)<60):
         print(gameState)
         
         #SAVE LOG GAME
-        target = open("logGameCNN.txt", 'w')
+        target = open("logCNN/logGameCNN"+str(numOfGame)+".txt", 'w')
         target.truncate() # clear it 
         for line in logGame:
             target.write(line)
+        target.close()
+        ti=0
+        target = open("logCNN/logMoveCNN"+str(numOfGame)+".txt", 'w')
+        for line in logMove:
+            target.write(str(ti)+" "+line+"\n")
+            ti+=1
         target.close()
         # save game state
          
         #tranning_network(input_layer, readout, h_fc1, sess, logGame,train_step,sock,saver,numOfGame)
         
+        # ADD GAME STATE TO DOMAIN WHAT EVER
+        totalTimeStep +=len(logGame)
         
-        #TRANNING STEP
-        if(len(D)>OBSERVE):
-            print("START OF TRAINING AT GAME %d th" %ithGame)   
-            print(len(logGame))
-            # add all 10k gameState to Domain
+        # add all 10k gameState to Domain
 
-            lastValidMove = MOVE.LEFT
-            lastAction  = MOVE.NEUTRAL
-            oldScore =0
-            lenX =  len(logGame)
-            originalObject =[]
-            originalFrame =[]
+        lastValidMove = MOVE.LEFT
+        lastAction  = MOVE.NEUTRAL
+        oldScore =0
+        lenX =  len(logGame)
+        originalObject =[]
+        originalFrame =[]
 
-            #precalculate
-            for i in range(lenX):
-                originalObject.append(Parse.parse_game_state(logGame[i]))
-                originalFrame.append( Frame.get_input_network ( originalObject[i]))
+        #precalculate
+        for i in range(lenX):
+            originalObject.append(Parse.parse_game_state(logGame[i]))
+            originalFrame.append( Frame.get_input_network ( originalObject[i]))
 
-            originalObject.append(Parse.parse_game_state(logGame[lenX-1]))
-            originalObject[lenX].pacmanWasEaten="True"
-            originalFrame.append( Frame.get_input_network ( originalObject[lenX]))      
-            lenX+=1
-
-            #add to domain
-            i = 0
-            while(i < (lenX-1)):
-                s_t = originalFrame[i]
-                #SET ACTION
-                a_t = np.zeros([ACTIONS])
-                action_index = originalObject[i+1].pacman.lastMoveMade
-
-                if (action_index==4) :
-                    action_index = lastValidMove
-                else:
-                    lastValidMove= action_index
-
-                a_t[action_index] = 1
-
-                terminal = False
-
-                if ((i+SKIP_FRAME )< lenX-1):
-                    nextFrame = i+SKIP_FRAME 
-                else :
-                     nextFrame = lenX-1
-
-                s_t1 = originalFrame[nextFrame]
+        #add to domain
+        i = 0
+        currentDomain = deque()
+        while(i < (lenX-1)):
+            s_t = originalFrame[i]
+            #SET ACTION
+            
+            current_move = originalObject[i].pacman.lastMoveMade
+            
+            terminal = False
+            
+            for k in range (0, SKIP_FRAME):
+                nextFrame = i+k+1
+                if ( originalObject[nextFrame].pacman.lastMoveMade != current_move ):
+                    nextFrame-=1
+                    break
                 if ( originalObject[nextFrame].pacmanWasEaten == "True" ):
-                    terminal = True
+                    break
+            
+            a_t = np.zeros([ACTIONS])
+            action_index = originalObject[nextFrame].pacman.lastMoveMade
+            
+            """ NO NEUTRAL - WRONG MOVE
+            if (action_index==4) :
+                action_index = lastValidMove
+            else:
+                lastValidMove= action_index
+            """
+            a_t[action_index] = 1
+            
+            
 
-                r_t = originalObject[nextFrame].score - oldScore
-                oldScore = originalObject[nextFrame].score
-                D.append((s_t, a_t, r_t, s_t1, terminal))
-                if len(D) > REPLAY_MEMORY:
-                    D.popleft()
+            s_t1 = originalFrame[nextFrame]
+            
+            if ( originalObject[nextFrame].pacmanWasEaten == "True" ):
+                terminal = True
 
+            r_t = originalObject[nextFrame].score - oldScore
+            oldScore = originalObject[nextFrame].score
+#            D.append((s_t, a_t, r_t, s_t1, terminal))
+            currentDomain.append((s_t, a_t, r_t, s_t1, terminal))
+            if len(currentDomain) > REPLAY_CURRENT_MEMORY:
+                currentDomain.popleft()
 
-                if(terminal==True):
-                   i = nextFrame
-                i+=1
-
-            currentBatch = min(len(D),BATCH)
-            #training 1k times with BATCH size
-
+            if(terminal==True):
+               i = nextFrame
+            i+=1
+        # END OF ADDING
+        
+        logTrain =[]
+        
+        #TRANNING CURRENT GAME ANYWAY
+        #if(len(D)>OBSERVE):
+        print("START OF TRAINING AT GAME %d th" %numOfGame)   
+        # TRANING 10 CURRENT GAME
+        #for i in range (0, TRANING_CURRENT_TIME):
+        # ONCE TIME ONLY ?
+        #minibatch = currentDomain
+        s_j_batch = [d[0] for d in currentDomain]
+        a_batch = [d[1] for d in currentDomain]
+        r_batch = [d[2] for d in currentDomain]
+        s_j1_batch = [d[3] for d in currentDomain]
+        y_batch = []
+        readout_j1_batch = readout.eval(feed_dict = {input_layer : s_j1_batch})
+        for k in range(0, len(currentDomain)):
+            if (currentDomain[k][4] == True ):
+                y_batch.append(r_batch[k])
+            else:
+                y_batch.append(r_batch[k] + GAMMA * np.max(readout_j1_batch[k]))
+            
+        for i in range (len(currentDomain)):
+            logTrain.append( str(i) +" " +str(a_batch[i])+ " " +str(r_batch[i])+ " "+ str( y_batch[i] )  )
+        
+        train_step.run(feed_dict = {
+            y : y_batch,
+            a : a_batch,
+            input_layer : s_j_batch})
+        # END TRANING CURRENT GAME
+            
+        #ADD TO CURRENT DOMAIN TO GLOBAL DOMAIN
+        for d in currentDomain:
+            D.append(d)
+            if len(D) > REPLAY_MEMORY:
+                D.popleft()
+        
+        currentDomain=deque()
+        
+        if(totalTimeStep>OBSERVE):         
+            #batch = min(BATCH, len(D))
+            #training TRANING_TIME times with BATCH size
             for i in range (0,TRANING_TIME):
                 #socket.send(("TRANNING %.2f" %(i*100.0/tranning_time) +"\n").encode())     
-                minibatch = random.sample(list(D), currentBatch)
+                minibatch = random.sample((D), BATCH)
 
                 # get the batch variablesi
 
@@ -428,7 +478,7 @@ while(terminator==False):
 
                 y_batch = []
 
-                readout_j1_batch = readout.eval(feed_dict = {s : s_j1_batch})
+                readout_j1_batch = readout.eval(feed_dict = {input_layer : s_j1_batch})
 
                 for k in range(0, len(minibatch)):
                     # if terminal only equals reward
@@ -436,45 +486,62 @@ while(terminator==False):
                         y_batch.append(r_batch[k])
                     else:
                         y_batch.append(r_batch[k] + GAMMA * np.max(readout_j1_batch[k]))
-
+                
+                for i in range (len(minibatch)):
+                     logTrain.append( str(i) +" " +str(a_batch[i])+ " " +str(r_batch[i])+ " "+ str( y_batch[i] )  )
+                
                 # perform gradient step
                 train_step.run(feed_dict = {
                     y : y_batch,
                     a : a_batch,
                     input_layer : s_j_batch})
 
-            saver.save(sess, 'saved_networks/' + GAME + '-dqn', global_step = ithGame)    
-            print("DONE TRAIN GAME %d th" %ithGame)
+            saver.save(sess, 'saved_networks/' + GAME + '-dqn', global_step = numOfGame)    
+            print("DONE TRAIN GAME %d th" %numOfGame)
         
         # END OF TRANNING
         
-        
+        #log train
+        target = open("logCNN/logTrain"+str(numOfGame)+".txt", 'w')
+        target.truncate() # clear it 
+        for line in logTrain:
+            target.write(line+"\n")
+        target.close()
+         
         
         command ="START_GAME"
         sock.send((command +"\n").encode())
         
         # edit epsilon
-        if epsilon > FINAL_EPSILON and len(D) > OBSERVE:
-            epsilon -= (INITIAL_EPSILON - FINAL_EPSILON) / EXPLORE
+        if epsilon >= FINAL_EPSILON and totalTimeStep> OBSERVE:
+            print("REDUCE EPSILON")
+            epsilon -= FINAL_EPSILON
         
         currentTime = timeit.default_timer()
         print("Time %d - TotalTime: %d " %(currentTime - oldCurrentTime,currentTime - timeStart) )
         oldCurrentTime = currentTime
         
         numOfGame +=1
-        print("START_GAME %d" %numOfGame)
+        print("START_GAME %d with epsilon %.2f" %(numOfGame,epsilon))
         logGame=[]
+        logMove=[]
         
     else :
          
         gameStateX = gameState.decode("utf-8") 
         logGame.append(gameStateX)
         
-        if random.random() <= epsilon or len(D) <= OBSERVE:
+        if random.random() <= epsilon or totalTimeStep <= OBSERVE:
             action = "RANDOM"
+            logMove.append("RANDOM")
         else: #or GET THE MAX ACTION FROM CURRENT STATE
-            action  = calculate_value_game_state(input_layer, readout, h_fc1, sess, gameStateX)
-    
+            gameObject = Parse.parse_game_state(gameStateX)
+            s_t=Frame.get_input_network(gameObject)
+            readout_t = readout.eval(feed_dict = {input_layer : [s_t]})[0]
+            action = np.argmax(readout_t)
+            str1 = " ".join(str(i) for i in readout_t)
+            logMove.append((str1)+ " "+str(action))
+            
         #send back to java
         sock.send(("%s" %(action) +"\n").encode())
 

@@ -78,6 +78,7 @@ public class RunGameByCNN {
         int maxLevel=0;
         int maxTime = 0;
         int bestRecord = 0;
+        int perRandom = 0;
         ServerSocket s = new ServerSocket(22009);//22009
         System.out.println("HOSTNAME: " + InetAddress.getLocalHost().getHostName());
 
@@ -110,11 +111,12 @@ public class RunGameByCNN {
             int timeStep = 0;
             String command = inFromPython.readLine();
 
-            if (command.indexOf("TRANNING") != -1) {
+           // if (command.indexOf("TRANNING") != -1) {
             //    percentTranning = Float.parseFloat(command.substring(("TRANNING").length()));
               //  formRunCNN.setValue(stringMove, game.getTotalTime(), game.getScore(), numOfGame, bestRecord, maxScore, maxTime,maxLevel, true, percentTranning);
-                continue;
-            } else if (command.equals("START_GAME")) {
+            //    continue;
+           // } else 
+           if (command.equals("START_GAME")) {
                 if (game.getScore() > maxScore) {
                     maxScore = game.getScore();
                     maxTime = game.getTotalTime();
@@ -126,7 +128,7 @@ public class RunGameByCNN {
 
                 try {
                     bw = new BufferedWriter(new FileWriter("LogRecord.txt", true));
-                    bw.write(numOfGame + "," + String.valueOf(game.getScore()));
+                    bw.write(numOfGame + "," + String.valueOf(game.getScore())+","+String.valueOf(game.getTotalTime()));
                     bw.newLine();
                     bw.flush();
                 } catch (IOException ioe) {
@@ -143,11 +145,21 @@ public class RunGameByCNN {
 
                 numOfGame++;
                 game = new Game(0);
+                pw.println(game.getGameState());
+                perRandom = 0;
 
-            } else {
-                 String moveString="";
+            }  
+           else if (game.gameOver()) {
+                    pw.println("GAME_OVER - Score :" + game.getScore() + " T: " + game.getTotalTime() +" L: "+ game.getCurrentLevel() + " R: "  +((int) (perRandom*100/game.getTotalTime())));
+                    
+                } 
+            
+            else {
+               // System.out.println("GIVE MOVE");
+                String moveString="";
                 // if RANDOM
                 if (command.equals("RANDOM")) {
+                    perRandom++;
                   Random R = new Random();
                   
                   MOVE[] listPosMove = game.getPossibleMoves(game.getPacmanCurrentNodeIndex(), game.getPacmanLastMoveMade());
@@ -164,17 +176,14 @@ public class RunGameByCNN {
                 
                 // check valid move
                 // not allow wrong move
-                if ( game.getNeighbour(game.getPacmanCurrentNodeIndex(), nextMove) ==-1)
-                {
-                    game.gameOver = true;
-                    game.pacmanWasEaten = true;
-                }
-                    
-                // first move should be random left and right
                 
-                    
-              //  stringMove = getMoveString(nextMove);
-
+                boolean forceToGameOver = false;
+                // force to die when can not finnnish a game or give a wrong move
+                if ( (game.getNeighbour(game.getPacmanCurrentNodeIndex(), nextMove) ==-1 ) || ( game.currentLevelTime > 0 && game.currentLevelTime ==3998 && game.getNumberOfActivePills()>0 ) )
+                {
+                   forceToGameOver = true;
+                }
+                else
                 {
                     // simulate ghost move
                    // Game simulatedGame = game.copy(false);
@@ -184,19 +193,25 @@ public class RunGameByCNN {
                    // timeStep++;
                     game.advanceGameGhostNoMove(nextMove);
                 }
-
-            }
-
             // write game state to python
-            if (command.indexOf("TRANNING") == -1) {
-                if (game.gameOver()) {
-                    pw.println("GAME_OVER - Score :" + game.getScore() + " T: " + game.getTotalTime() +" L: "+ game.getCurrentLevel());
-
-                } else  {
-
-                    pw.println(game.getGameState());
-                }
+            // w rite gamestate backc in anycase
+           if(forceToGameOver){
+                game.totalTime++;
+                game.pacman.lastMoveMade = nextMove;
+                game.gameOver = true;
+                game.pacmanWasEaten = true;
+                
+           }
+           if(game.pacmanWasEaten)
+               game.score -=100;
+           if(game.currentLevelTime==0 && game.levelCount>0)
+               game.score+=500;
+           
+            game.score--;
+            pw.println(game.getGameState());
             }
+
+                       
 
          //   formRunCNN.setValue(stringMove, game.getTotalTime(), game.getScore(), numOfGame, bestRecord, maxScore, maxTime, maxLevel, game.gameOver(), percentTranning);
         }

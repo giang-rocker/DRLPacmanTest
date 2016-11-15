@@ -18,8 +18,8 @@ from collections import deque
 GAME = 'pacman' # the name of the game being played for log files
 ACTIONS = 4 # number of valid actions
 GAMMA = 0.95 # decay rate of past observations
-OBSERVE = 500000 # timesteps to observe before traini ng
-EXPLORE = 500000 # frames over which to anneal epsilon
+OBSERVE = 100000 # timesteps to observe before traini ng
+EXPLORE = 100000 # frames over which to anneal epsilon
 FINAL_EPSILON = 0.05 # final value of epsilon
 INITIAL_EPSILON = 1 # starting value of epsilon
 REPLAY_MEMORY = 30000 # number of previous transitions to remember
@@ -64,7 +64,7 @@ def createNetwork():
     W_conv4 = weight_variable([2, 2, 64, 64])
     b_conv4 = bias_variable([64])
     
-    W_fc1 = weight_variable([4096, 512])
+    W_fc1 = weight_variable([1024, 512])
     #W_fc1 = weight_variable([256, 512])
     b_fc1 = bias_variable([512])
 
@@ -82,13 +82,13 @@ def createNetwork():
     h_pool2 = max_pool_2x2(h_conv2)
 
     h_conv3 = tf.nn.relu(conv2d(h_pool2, W_conv3, 1) + b_conv3)
-    #h_pool3 = max_pool_2x2(h_conv3)
+    h_pool3 = max_pool_2x2(h_conv3)
     
-    #h_conv4 = tf.nn.relu(conv2d(h_pool3, W_conv4, 1) + b_conv4)
-    h_conv4 = tf.nn.relu(conv2d(h_conv3, W_conv4, 1) + b_conv4)
+    h_conv4 = tf.nn.relu(conv2d(h_pool3, W_conv4, 1) + b_conv4)
+    #h_conv4 = tf.nn.relu(conv2d(h_conv3, W_conv4, 1) + b_conv4)
     #h_pool4 = max_pool_2x2(h_conv4)
 
-    h_pool4_flat = tf.reshape(h_conv4, [-1,  4096])
+    h_pool4_flat = tf.reshape(h_conv4, [-1,  1024])
     #h_pool4_flat = tf.reshape(h_pool4, [-1, 256])
     
     
@@ -323,6 +323,9 @@ else:
 #SUPERVISEDLEARNING
 #supervised_learning(input_layer, readout, h_fc1, sess, train_step,sock,saver)
 
+
+
+#ENDSUPERVISEDLEARNING
 print("START  %d %d" %(OBSERVE, EXPLORE))
 
 while(terminator==False):
@@ -367,6 +370,7 @@ while(terminator==False):
 
         #add to domain
         i = 0
+        
         currentDomain = deque()
         while(i < (lenX-1)):
             s_t = originalFrame[i]
@@ -404,7 +408,8 @@ while(terminator==False):
 
             r_t = originalObject[nextFrame].score - oldScore
             oldScore = originalObject[nextFrame].score
-#            D.append((s_t, a_t, r_t, s_t1, terminal))
+            #D.append((s_t, a_t, r_t, s_t1, terminal))
+            #r_t = finalScore - originalObject[nextFrame].score
             currentDomain.append((s_t, a_t, r_t, s_t1, terminal))
             if len(currentDomain) > REPLAY_CURRENT_MEMORY:
                 currentDomain.popleft()

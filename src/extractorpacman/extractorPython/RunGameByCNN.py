@@ -22,17 +22,17 @@ OBSERVE = 100000 # timesteps to observe before traini ng
 EXPLORE = 100000 # frames over which to anneal epsilon
 FINAL_EPSILON = 0.05 # final value of epsilon
 INITIAL_EPSILON = 1 # starting value of epsilon
-REPLAY_MEMORY = 30000 # number of previous transitions to remember
+REPLAY_MEMORY = 50000 # number of previous transitions to remember
 REPLAY_CURRENT_MEMORY = 4000 # last 4k step of current game
 BATCH = 32 # size of minibatch
 K = 1 # only select an action every Kth frame, repeat prev for others
 SIZEX = 30
 SIZEY=30
-NUM_OF_FRAME = 30
+NUM_OF_FRAME = 11
 TRANING_TIME = 100
 SAVING_STEP =20
 LEARNING_RATE =0.0005
-SKIP_FRAME = 1
+SKIP_FRAME = 4
 NUM_OF_LEARNED_GAME = 10
 TRANING_CURRENT_TIME = 1
 
@@ -163,7 +163,7 @@ def tranning_network(s, readout, h_fc1, sess, gameState,train_step, socket,saver
         else:
             lastValidMove= action_index
 
-        a_t[action_index] = 1
+        a_t[action_index-1] = 1
 
         terminal = False
 
@@ -377,13 +377,16 @@ while(terminator==False):
             #SET ACTION
             
             current_move = originalObject[i].pacman.lastMoveMade
-            
+            rewardTurn = 0
             terminal = False
-            
+            nextFrame =0
             for k in range (0, SKIP_FRAME):
                 nextFrame = i+k+1
                 if ( originalObject[nextFrame].pacman.lastMoveMade != current_move ):
-                    nextFrame-=1
+                    if(k>0):
+                        nextFrame-=1
+                    else: 
+                        rewardTurn=500
                     break
                 if ( originalObject[nextFrame].pacmanWasEaten == "True" ):
                     break
@@ -397,7 +400,7 @@ while(terminator==False):
             else:
                 lastValidMove= action_index
             """
-            a_t[action_index] = 1
+            a_t[action_index-1] = 1
             
             
 
@@ -406,8 +409,8 @@ while(terminator==False):
             if ( originalObject[nextFrame].pacmanWasEaten == "True" ):
                 terminal = True
 
-            r_t = originalObject[nextFrame].score - oldScore
-            oldScore = originalObject[nextFrame].score
+            r_t = originalObject[nextFrame].score - originalObject[i].score + rewardTurn
+            
             #D.append((s_t, a_t, r_t, s_t1, terminal))
             #r_t = finalScore - originalObject[nextFrame].score
             currentDomain.append((s_t, a_t, r_t, s_t1, terminal))
@@ -543,7 +546,7 @@ while(terminator==False):
             gameObject = Parse.parse_game_state(gameStateX)
             s_t=Frame.get_input_network(gameObject)
             readout_t = readout.eval(feed_dict = {input_layer : [s_t]})[0]
-            action = np.argmax(readout_t)
+            action = np.argmax(readout_t)+1
             str1 = " ".join(str(i) for i in readout_t)
             logMove.append((str1)+ " "+str(action))
             
@@ -552,4 +555,3 @@ while(terminator==False):
 
 
 print("GAME_OVER")
-s.close

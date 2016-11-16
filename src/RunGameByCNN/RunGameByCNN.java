@@ -31,16 +31,16 @@ public class RunGameByCNN {
     public static MOVE getMove(int ret) {
         MOVE nextMove = MOVE.NEUTRAL;
         switch (ret) {
-            case 0:
+            case 1:
                 nextMove = MOVE.DOWN;
                 break;
-            case 1:
+            case 2:
                 nextMove = MOVE.LEFT;
                 break;
-            case 2:
+            case 3:
                 nextMove = MOVE.UP;
                 break;
-            case 3:
+            case 4:
                 nextMove = MOVE.RIGHT;
                 break;
             default:
@@ -191,7 +191,12 @@ public class RunGameByCNN {
                     //EnumMap<Constants.GHOST, MOVE> listGhostMove = new EnumMap<>(Constants.GHOST.class);
                    // listGhostMove = ghostsMove.getMove(simulatedGame);
                    // timeStep++;
+                    MOVE lastMove = game.getPacmanLastMoveMade();
                     game.advanceGameGhostNoMove(nextMove);
+                    
+                    if (!game.gameOver() && nextMove != lastMove && nextMove !=lastMove.opposite())
+                        game.score+=100;
+                    
                 }
             // write game state to python
             // w rite gamestate backc in anycase
@@ -207,6 +212,7 @@ public class RunGameByCNN {
            if(game.currentLevelTime==0 && game.levelCount>0)
                game.score+=500;
            
+           if ((game.getTotalTime()+1)%4==0)
             game.score--;
             pw.println(game.getGameState());
             }

@@ -8,21 +8,21 @@
 from enum import IntEnum
 
 class MOVE (IntEnum):
-    DOWN = 0 
-    LEFT = 1
-    UP = 2 
-    RIGHT = 3
-    NEUTRAL = 4
+    DOWN = 1
+    LEFT = 2
+    UP = 3
+    RIGHT = 4
+    NEUTRAL = 5
     
     @staticmethod
     def get_move (_move):
-        if(_move == "DOWN") or (_move ==0):
+        if(_move == "DOWN") or (_move ==1):
             return MOVE.DOWN
-        elif(_move == "LEFT") or (_move ==1):
+        elif(_move == "LEFT") or (_move ==2):
             return MOVE.LEFT
-        elif(_move == "UP") or (_move ==2):
+        elif(_move == "UP") or (_move ==3):
             return MOVE.UP
-        elif(_move == "RIGHT") or (_move ==3):
+        elif(_move == "RIGHT") or (_move ==4):
             return MOVE.RIGHT
         else:
             return MOVE.NEUTRAL

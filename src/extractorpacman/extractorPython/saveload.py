@@ -111,7 +111,7 @@ def calculate_value_game_state(input_layer, readout, h_fc1, sess, gameState):
     
     print(len(s_t))
     for st in s_t[3]:
-        print (st.shape)
+        print (st.print_frame)
         #print(st)
     
     print(len(s_t))

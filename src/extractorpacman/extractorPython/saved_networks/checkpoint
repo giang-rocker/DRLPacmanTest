@@ -1,6 +1,0 @@
-model_checkpoint_path: "pacman-dqn-53"
-all_model_checkpoint_paths: "pacman-dqn-49"
-all_model_checkpoint_paths: "pacman-dqn-50"
-all_model_checkpoint_paths: "pacman-dqn-51"
-all_model_checkpoint_paths: "pacman-dqn-52"
-all_model_checkpoint_paths: "pacman-dqn-53"

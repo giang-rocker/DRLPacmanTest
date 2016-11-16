@@ -10,7 +10,7 @@ class Frame:
     
     frame_size_x = 30
     frame_size_y = 30
-    numberOfFrame  = 30
+    numberOfFrame  = 11
     
     def __init__(self,_frameName,_matrix):
         self.frameName = _frameName
@@ -30,24 +30,31 @@ class Frame:
         
         #9 frame of pacman Position [3-11]
         framePacman =Frame.create_frame_paman_position(_gameState)
-        for i in range (0,9):
+        #for i in range (0,9):
+        for i in range (3):
             #frames.append( Frame("PacmanPosition", framePacman[i]))
             frameMatrix.append(framePacman[i])
         #4 frame of pacman last Move  [12-16]
-        framePacman = Frame.create_frame_paman_lastMove(_gameState)
-        for i in range (0,4):
-            frameMatrix.append(framePacman[i])
+        #framePacman = Frame.create_frame_paman_lastMove(_gameState)
+        frameMatrix.append(Frame.create_frame_paman_lastMove(_gameState))
+        #
+        #for i in range (0,4):
+        #for i in range (1):
+        #    frameMatrix.append(framePacman[i])
         
             
         #4 frame of pacman Position [17-25]
         framePacman =Frame.create_frame_ghost_position(_gameState)
-        for i in range (0,9):
+        for i in range (3):
             frameMatrix.append(framePacman[i])
 
         #5 frame of pacman last Move  [26-30]
+        """
         framePacman = Frame.create_frame_ghost_lastMove(_gameState)
-        for i in range (0,5):
+        for i in range (1):
             frameMatrix.append(framePacman[i])
+        """
+        frameMatrix.append(Frame.create_frame_ghost_lastMove(_gameState))
         
         #1 edible Time    31
         #frameMatrix.append(Frame.create_frame_edible_time(_gameState))
@@ -56,49 +63,14 @@ class Frame:
         #1 Current Time    33
         #frameMatrix.append(Frame.create_frame_current_level(_gameState))
         
+         
         frameMatrixReturn = np.stack(frameMatrix, axis = 2)
         
         return frameMatrixReturn
-    @staticmethod
-    def get_input_network_returnFrame(_gameState):
-        frames = []
-        
-        #0
-        frames.append(Frame ("Path",Frame.create_frame_path(_gameState)))
-        #1
-        frames.append(Frame ("Pill",Frame.create_frame_pill(_gameState)))
-        #2
-        frames.append(Frame ("PowerPill",Frame.create_frame_power_pill(_gameState)))
-        
-        #9 frame of pacman Position [3-11]
-        framePacman =Frame.create_frame_paman_position(_gameState)
-        for i in range (0,9):
-            frames.append( Frame("PacmanPosition", framePacman[i]))
-       
-        #4 frame of pacman last Move  [12-16]
-        framePacman = Frame.create_frame_paman_lastMove(_gameState)
-        for i in range (0,4):
-            frames.append( Frame("PacmanLastMove", framePacman[i]))
-        
-            
-        #4 frame of pacman Position [17-25]
-        framePacman =Frame.create_frame_ghost_position(_gameState)
-        for i in range (0,9):
-            frames.append( Frame("GhostPosition", framePacman[i]))
-       
-        #5 frame of pacman last Move  [26-30]
-        framePacman = Frame.create_frame_ghost_lastMove(_gameState)
-        for i in range (0,5):
-            frames.append( Frame("GhostLastMove", framePacman[i])) 
-        
-        #1 edible Time    31
-        frames.append(Frame ("edibleTime",Frame.create_frame_edible_time(_gameState)))
-        
-        return frames    
-        
+    
     @staticmethod
     def create_frame_path(_gameState):
-        frameMiniMap =[[0 for x in range(Frame.frame_size_y)] for y in range(Frame.frame_size_x)] 
+        frameMiniMap =np.zeros((Frame.frame_size_y,Frame.frame_size_x))
         
         for  i in range (0, _gameState.maze.numberOfNode):
             if (_gameState.maze.listNode[i].y %4 ==0 ) and (_gameState.maze.listNode[i].x %4==0 ):
@@ -111,7 +83,7 @@ class Frame:
     
     @staticmethod
     def create_frame_pill(_gameState):
-        framePill =[[0 for x in range(Frame.frame_size_y)] for y in range(Frame.frame_size_x)] 
+        framePill =np.zeros((Frame.frame_size_y,Frame.frame_size_x))
         
         for  i in range (0, _gameState.maze.numberOfPill):
             if (_gameState.listPillStatus[i]==True) :
@@ -125,7 +97,7 @@ class Frame:
     
     @staticmethod
     def create_frame_power_pill(_gameState):
-        framePowerPill =[[0 for x in range(Frame.frame_size_y)] for y in range(Frame.frame_size_x)] 
+        framePowerPill =np.zeros((Frame.frame_size_y,Frame.frame_size_x))
         
         for  i in range (0, _gameState.maze.numberOfPowerPill):
             if (_gameState.listPowerPillStatus[i]==True) :
@@ -138,41 +110,50 @@ class Frame:
         
     @staticmethod
     def create_frame_paman_position(_gameState):
-        framePacMan =[[[0 for col in range(Frame.frame_size_y)]for row in range(Frame.frame_size_x)] for x in range(9)]
-        
-        x = int(_gameState.maze.listNode[_gameState.pacman.currentNodeIndex].y / 4)
-        y = int(_gameState.maze.listNode[_gameState.pacman.currentNodeIndex].x  / 4)
+        framePacMan =np.zeros(((3,Frame.frame_size_y,Frame.frame_size_x)))
         
         realPosX = _gameState.maze.listNode[_gameState.pacman.currentNodeIndex].y
         realPosY = _gameState.maze.listNode[_gameState.pacman.currentNodeIndex].x
+    
+        x = int(realPosX / 4)
+        y = int(realPosY / 4)
+        
                   
         framePacMan[0][x][y] = 1;
-        framePacMan[1+(realPosX % 4)][x][y] = 1; 
-        framePacMan[5+(realPosY % 4)][x][y] = 1;
+        """
+        framePacMan[1+(realPosX % 4)][x][y] = 1 
+        framePacMan[5+(realPosY % 4)][x][y] = 1
+        """
+        framePacMan[1][x][y] = (realPosX % 4)
+        framePacMan[2][x][y] = (realPosY % 4)
         return framePacMan 
              
     @staticmethod
     def create_frame_paman_lastMove(_gameState):
-        framePacMan =[[[0 for col in range(Frame.frame_size_y)]for row in range(Frame.frame_size_x)] for x in range(4)]
+        #framePacMan =[[[0 for col in range(Frame.frame_size_y)]for row in range(Frame.frame_size_x)] for x in range(4)]
+        framePacMan =np.zeros((Frame.frame_size_y,Frame.frame_size_x)) 
         
         x = int(_gameState.maze.listNode[_gameState.pacman.currentNodeIndex].y / 4)
         y = int(_gameState.maze.listNode[_gameState.pacman.currentNodeIndex].x  / 4)
         
         
         move = _gameState.pacman.lastMoveMade
-        framePacMan[move%4][x][y] = 1;
+        #framePacMan[move%4][x][y] = 1;
+        framePacMan[x][y] = move%5;
+            
         return framePacMan
     
     @staticmethod
     def create_frame_ghost_position(_gameState):
-        frameGhost =[[[0 for col in range(Frame.frame_size_y)]for row in range(Frame.frame_size_x)] for x in range(9)]
+        frameGhost =np.zeros(((3,Frame.frame_size_y,Frame.frame_size_x)))
         
         for i in range (0,4):
-            x = int(_gameState.maze.listNode[_gameState.ghosts[i].currentNodeIndex].y / 4)
-            y = int(_gameState.maze.listNode[_gameState.ghosts[i].currentNodeIndex].x  / 4)
-
+            
             realPosX = _gameState.maze.listNode[_gameState.ghosts[i].currentNodeIndex].y
             realPosY = _gameState.maze.listNode[_gameState.ghosts[i].currentNodeIndex].x
+            
+            x = int(realPosX / 4)
+            y = int(realPosY  / 4)
             
             value = 0
             if (_gameState.ghosts[i].edibleTime >0):
@@ -182,14 +163,19 @@ class Frame:
             
             #print("%d %d" %(x,y))
             frameGhost[0][x][y] = value;
+            """
             frameGhost[1+(realPosX % 4)][x][y] = value; 
             frameGhost[5+(realPosY % 4)][x][y] = value;
+            """
+            frameGhost[1][x][y] = value*(realPosX % 4); 
+            frameGhost[2][x][y] = value*(realPosY % 4);
             
         return frameGhost 
              
     @staticmethod
     def create_frame_ghost_lastMove(_gameState):
-        frameGhost =[[[0 for col in range(Frame.frame_size_y)]for row in range(Frame.frame_size_x)] for x in range(5)]
+        #frameGhost =[[[0 for col in range(Frame.frame_size_y)]for row in range(Frame.frame_size_x)] for x in range(5)]
+        frameGhost =np.zeros((Frame.frame_size_y,Frame.frame_size_x))
         
         for i in range (0,4):
             x = int(_gameState.maze.listNode[_gameState.ghosts[i].currentNodeIndex].y / 4)
@@ -198,13 +184,14 @@ class Frame:
             move = _gameState.ghosts[i].lastMoveMade
             #print("%s  " %MOVE.get_move(move))
             
-            frameGhost[move%5][x][y] = 1;
+            #frameGhost[move%5][x][y] = 1;
+            frameGhost[x][y] = move%5;
             
         return frameGhost
     
     @staticmethod
     def create_frame_edible_time(_gameState):
-        frameGhost =[[0 for x in range(Frame.frame_size_y)] for y in range(Frame.frame_size_x)] 
+        frameGhost =np.zeros((Frame.frame_size_y,Frame.frame_size_x))
         
         for i in range (0,4):
             x = int(_gameState.maze.listNode[_gameState.ghosts[i].currentNodeIndex].y / 4)
@@ -217,7 +204,7 @@ class Frame:
     
     @staticmethod
     def create_frame_current_time(_gameState):
-        frame =[[0 for x in range(Frame.frame_size_y)] for y in range(Frame.frame_size_x)] 
+        frame =np.zeros((Frame.frame_size_y,Frame.frame_size_x))
         time = _gameState.currentLevelTime
         
         for i in range (0, Frame.frame_size_x):
@@ -228,7 +215,7 @@ class Frame:
     
     @staticmethod
     def create_frame_current_level(_gameState):
-        frame =[[0 for x in range(Frame.frame_size_y)] for y in range(Frame.frame_size_x)] 
+        frame  =np.zeros((Frame.frame_size_y,Frame.frame_size_x))
         level = _gameState.levelCount
         
         for i in range (0, Frame.frame_size_x):
@@ -241,3 +228,4 @@ class Frame:
         print (self.frameName)
         for i in range (0, Frame.frame_size_x):
             print (  self.matrix[i])
+            

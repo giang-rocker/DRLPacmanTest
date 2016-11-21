@@ -62,10 +62,12 @@ class Parse:
             listGhost.append(ghost)
 
         #pill info
+        activePill =0
         numberOfPill = currentMaze.numberOfPill
         listPillStatus=[]
         for i in range (0, numberOfPill):
                 if (values[index][i] == '1') :
+                    activePill+=1
                     listPillStatus.append(True)
                 else:
                     listPillStatus.append(False)
@@ -97,9 +99,9 @@ class Parse:
         index+=1
         powerPillWasEaten = (values[index].capitalize());
         index+=1
-
+        gameOver = (values[index].capitalize());
         # create maze by information
-        gameState = GameState(currentMaze,mazeIndex,totalTime,score,currentLevelTime,levelCount,pacman,listGhost,listPillStatus,listPowerPillStatus,timeOfLastGlobalReversal,pacmanWasEaten,pillWasEaten,powerPillWasEaten)
+        gameState = GameState(currentMaze,mazeIndex,totalTime,score,currentLevelTime,levelCount,pacman,listGhost,listPillStatus,listPowerPillStatus,timeOfLastGlobalReversal,pacmanWasEaten,pillWasEaten,powerPillWasEaten,activePill,gameOver)
         #gameState.print_game_state()    
         return gameState
         

@@ -51,7 +51,7 @@ class GameState:
     
     #listPills boolean pillIndex available or not
       
-    def __init__(self,_maze,_mazeIndex,_totalTime,_score,_currentLevelTime,_levelCount,_pacman,_listGhost,_listPillStatus,_listPowerPillStatus,_timeOfLastGlobalReversal,_pacmanWasEaten,_pillWasEaten,_powerPillWasEaten):
+    def __init__(self,_maze,_mazeIndex,_totalTime,_score,_currentLevelTime,_levelCount,_pacman,_listGhost,_listPillStatus,_listPowerPillStatus,_timeOfLastGlobalReversal,_pacmanWasEaten,_pillWasEaten,_powerPillWasEaten,_activePill,_gameOver):
         
         self.maze= _maze
         self.mazeIndex= _mazeIndex
@@ -69,6 +69,8 @@ class GameState:
         self.pacmanWasEaten = _pacmanWasEaten
         self.pillWasEaten = _pillWasEaten
         self.powerPillWasEaten = _powerPillWasEaten
+        self.activePill = _activePill
+        self.gameOver = _gameOver
         
         
     

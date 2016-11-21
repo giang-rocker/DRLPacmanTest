@@ -167,6 +167,10 @@ public class RunGameByCNN {
             //      moveString = nextMove.toString();
                   
                 }
+                // NO NEED to train
+                else if ( game.getNodeXCood(game.getPacmanCurrentNodeIndex())%4!=0 || game.getNodeYCood(game.getPacmanCurrentNodeIndex())%4!=0 ){
+                   nextMove = game.getPacmanLastMoveMade();
+                }
                 else{                
               //  moveString = command;
                 // convert to int
@@ -179,23 +183,20 @@ public class RunGameByCNN {
                 
                 boolean forceToGameOver = false;
                 // force to die when can not finnnish a game or give a wrong move
-                if ( (game.getNeighbour(game.getPacmanCurrentNodeIndex(), nextMove) ==-1 ) || ( game.currentLevelTime > 0 && game.currentLevelTime ==3998 && game.getNumberOfActivePills()>0 ) )
+                if (game.getNeighbour(game.getPacmanCurrentNodeIndex(), nextMove) ==-1)
                 {
                    forceToGameOver = true;
                 }
                 else
                 {
                     // simulate ghost move
-                   // Game simulatedGame = game.copy(false);
-                    //SimulateGhostMove ghostsMove = new SimulateGhostMove();
-                    //EnumMap<Constants.GHOST, MOVE> listGhostMove = new EnumMap<>(Constants.GHOST.class);
-                   // listGhostMove = ghostsMove.getMove(simulatedGame);
-                   // timeStep++;
-                    MOVE lastMove = game.getPacmanLastMoveMade();
-                    game.advanceGameGhostNoMove(nextMove);
-                    
-                    if (!game.gameOver() && nextMove != lastMove && nextMove !=lastMove.opposite())
-                        game.score+=100;
+                    Game simulatedGame = game.copy(false);
+                    SimulateGhostMove ghostsMove = new SimulateGhostMove();
+                    EnumMap<Constants.GHOST, MOVE> listGhostMove = new EnumMap<>(Constants.GHOST.class);
+                    listGhostMove = ghostsMove.getMove(simulatedGame);
+                   
+                    game.advanceGame(nextMove,listGhostMove);
+                      
                     
                 }
             // write game state to python
@@ -205,20 +206,11 @@ public class RunGameByCNN {
                 game.pacman.lastMoveMade = nextMove;
                 game.gameOver = true;
                 game.pacmanWasEaten = true;
-                
-           }
-           if(game.pacmanWasEaten)
-               game.score -=100;
-           if(game.currentLevelTime==0 && game.levelCount>0)
-               game.score+=500;
-           
-           if ((game.getTotalTime()+1)%4==0)
-            game.score--;
+            }
+            
             pw.println(game.getGameState());
             }
-
-                       
-
+ 
          //   formRunCNN.setValue(stringMove, game.getTotalTime(), game.getScore(), numOfGame, bestRecord, maxScore, maxTime, maxLevel, game.gameOver(), percentTranning);
         }
 

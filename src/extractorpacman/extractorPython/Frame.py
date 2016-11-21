@@ -67,11 +67,60 @@ class Frame:
         frameMatrixReturn = np.stack(frameMatrix, axis = 2)
         
         return frameMatrixReturn
-    
+    @staticmethod
+    def get_input_network_debug(_gameState):
+        
+        frameMatrix=[]
+        #0
+        frameMatrix.append(Frame.create_frame_path(_gameState))
+        #1
+        frameMatrix.append(Frame.create_frame_pill(_gameState))
+        #2
+        frameMatrix.append(Frame.create_frame_power_pill(_gameState))
+        
+        #9 frame of pacman Position [3-11]
+        framePacman =Frame.create_frame_paman_position(_gameState)
+        #for i in range (0,9):
+        for i in range (3):
+            #frames.append( Frame("PacmanPosition", framePacman[i]))
+            frameMatrix.append(framePacman[i])
+        #4 frame of pacman last Move  [12-16]
+        #framePacman = Frame.create_frame_paman_lastMove(_gameState)
+        frameMatrix.append(Frame.create_frame_paman_lastMove(_gameState))
+        #
+        #for i in range (0,4):
+        #for i in range (1):
+        #    frameMatrix.append(framePacman[i])
+        
+            
+        #4 frame of pacman Position [17-25]
+        framePacman =Frame.create_frame_ghost_position(_gameState)
+        for i in range (3):
+            frameMatrix.append(framePacman[i])
+
+        #5 frame of pacman last Move  [26-30]
+        """
+        framePacman = Frame.create_frame_ghost_lastMove(_gameState)
+        for i in range (1):
+            frameMatrix.append(framePacman[i])
+        """
+        frameMatrix.append(Frame.create_frame_ghost_lastMove(_gameState))
+        
+        #1 edible Time    31
+        #frameMatrix.append(Frame.create_frame_edible_time(_gameState))
+        #1 CurrentLevel Level    32
+        #frameMatrix.append(Frame.create_frame_current_time(_gameState))
+        #1 Current Time    33
+        #frameMatrix.append(Frame.create_frame_current_level(_gameState))
+        
+         
+        frameMatrixReturn = np.stack(frameMatrix, axis = 2)
+        
+        return frameMatrix,frameMatrixReturn
     @staticmethod
     def create_frame_path(_gameState):
         frameMiniMap =np.zeros((Frame.frame_size_y,Frame.frame_size_x))
-        
+    
         for  i in range (0, _gameState.maze.numberOfNode):
             if (_gameState.maze.listNode[i].y %4 ==0 ) and (_gameState.maze.listNode[i].x %4==0 ):
                 x = int(_gameState.maze.listNode[i].y / 4)
@@ -86,25 +135,25 @@ class Frame:
         framePill =np.zeros((Frame.frame_size_y,Frame.frame_size_x))
         
         for  i in range (0, _gameState.maze.numberOfPill):
+            x = int(_gameState.maze.listPill[i].y / 4)
+            y = int(_gameState.maze.listPill[i].x  / 4)
             if (_gameState.listPillStatus[i]==True) :
-                
-                x = int(_gameState.maze.listPill[i].y / 4)
-                y = int(_gameState.maze.listPill[i].x  / 4)
-                
                 framePill[x][y] = 1;
+            
             
         return framePill
     
     @staticmethod
     def create_frame_power_pill(_gameState):
-        framePowerPill =np.zeros((Frame.frame_size_y,Frame.frame_size_x))
+        framePowerPill = np.zeros((Frame.frame_size_y,Frame.frame_size_x))
         
         for  i in range (0, _gameState.maze.numberOfPowerPill):
+            x = int(_gameState.maze.listPowerPill[i].y / 4)
+            y = int(_gameState.maze.listPowerPill[i].x  / 4)
+               
             if (_gameState.listPowerPillStatus[i]==True) :
-                x = int(_gameState.maze.listPowerPill[i].y / 4)
-                y = int(_gameState.maze.listPowerPill[i].x  / 4)
-                  
-                framePowerPill[x][y] = 1;
+                 framePowerPill[x][y] = 1;
+            
             
         return framePowerPill
         

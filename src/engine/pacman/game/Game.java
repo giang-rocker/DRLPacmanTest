@@ -343,6 +343,8 @@ public final class Game {
         sb.append(pillWasEaten);
         sb.append(",");
         sb.append(powerPillWasEaten);
+        sb.append(",");
+        sb.append(gameOver);
 
         return sb.toString();
     }

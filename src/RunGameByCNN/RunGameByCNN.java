@@ -125,10 +125,14 @@ public class RunGameByCNN {
                 }
 
                 BufferedWriter bw = null;
-
+                
+                if(numOfGame>0)
                 try {
                     bw = new BufferedWriter(new FileWriter("LogRecord.txt", true));
-                    bw.write(numOfGame + "," + String.valueOf(game.getScore())+","+String.valueOf(game.getTotalTime()));
+                    String random ="";
+                    if(perRandom == game.getTotalTime())
+                        random = "RANDOM";
+                    bw.write(numOfGame + "," + String.valueOf(game.getScore())+","+String.valueOf(game.getTotalTime())+","+String.valueOf(game.levelCount) +","+random);
                     bw.newLine();
                     bw.flush();
                 } catch (IOException ioe) {

@@ -28,7 +28,7 @@ K = 1 # only select an action every Kth frame, repeat prev for others
 SIZEX = 30
 SIZEY=30
 NUM_OF_FRAME = 11
-TRANING_TIME = 100
+TRANING_TIME = 200
 SAVING_STEP =20
 LEARNING_RATE =0.0005
 SKIP_FRAME = 4
@@ -281,7 +281,7 @@ y = tf.placeholder("float", [None])
 readout_action = tf.reduce_sum(tf.mul(readout, a), reduction_indices = 1)    
 cost = tf.reduce_mean(tf.square(y - readout_action))
 train_step = tf.train.AdamOptimizer(LEARNING_RATE).minimize(cost)
-saver = tf.train.Saver()
+saver = tf.train.Saver(max_to_keep=None)
 
 
 sess.run(tf.initialize_all_variables())
@@ -342,7 +342,7 @@ while(terminator==False):
         #tranning_network(input_layer, readout, h_fc1, sess, logGame,train_step,sock,saver,numOfGame)
         
         # ADD GAME STATE TO DOMAIN WHAT EVER
-        totalTimeStep +=len(logGame)
+       
         
         # add all 10k gameState to Domain
 
@@ -375,7 +375,8 @@ while(terminator==False):
         
         lenX = len(originalObject)
         currentDomain = deque()
-        for i in range (0,lenX-1):
+        i =0
+        while(i<(lenX-1)):
             s_t = originalFrame[i]
             #SET ACTION
             terminal = False
@@ -411,18 +412,19 @@ while(terminator==False):
             
             if(terminal):        
                 i +=1
+            i+=1
             
         # END OF ADDING
         
         logTrain =[]
-        
+        currentBatch = min ( len(currentDomain),BATCH )
         #TRANNING CURRENT GAME ANYWAY
         #if(len(D)>OBSERVE):
         error =0
        # print("START OF TRAINING AT GAME %d th" %numOfGame)   
-        for i in range (0,TRANING_TIME):
+        for i in range (0,5):
                 #socket.send(("TRANNING %.2f" %(i*100.0/tranning_time) +"\n").encode())     
-                minibatch = random.sample((currentDomain), BATCH)
+                minibatch = random.sample((currentDomain), currentBatch)
 
                 # get the batch variablesi
                 s_j_batch = [d[0] for d in minibatch]
@@ -453,7 +455,7 @@ while(terminator==False):
                     input_layer : s_j_batch})
                 
         # END TRANING CURRENT GAME
-           
+        totalTimeStep +=len(currentDomain)
         #ADD TO CURRENT DOMAIN TO GLOBAL DOMAIN
         for d in currentDomain:
             D.append(d)
@@ -461,10 +463,10 @@ while(terminator==False):
                 D.popleft()
         
         currentDomain=deque()
+        #print(len(D))
+        avgError = error/5
         
-        avgError = error/TRANING_TIME
-        
-        if(totalTimeStep>OBSERVE  ):         
+        if(totalTimeStep>REPLAY_MEMORY  ):         
             #batch = min(BATCH, len(D))
             #training TRANING_TIME times with BATCH size
             for i in range (0,TRANING_TIME):
@@ -500,7 +502,7 @@ while(terminator==False):
                     a : a_batch,
                     input_layer : s_j_batch})
                     
-            avgError = error/(2*TRANING_TIME)
+            avgError = error/(TRANING_TIME+5)
                 
         if(numOfGame%20==0):
             saver.save(sess, 'saved_networks/' + GAME + '-dqn', global_step = numOfGame)    
@@ -525,7 +527,7 @@ while(terminator==False):
         target.close()
         """
         # edit epsilon
-        if epsilon >= FINAL_EPSILON and totalTimeStep> OBSERVE:
+        if epsilon >= FINAL_EPSILON and totalTimeStep> REPLAY_MEMORY:
             print("REDUCE EPSILON")
             epsilon -= FINAL_EPSILON/2
         
@@ -552,11 +554,7 @@ while(terminator==False):
         #logMove=[]
         
         #reset memory
-        if(numOfGame %400==0):
-            D=[]
-            D= deque()
-            
-        
+          
         command ="START_GAME"
         sock.send((command +"\n").encode())
         

@@ -28,3 +28,15 @@ class MOVE (IntEnum):
             return MOVE.NEUTRAL
         
      
+    @staticmethod
+    def get_opposite_move (_move):
+        if(_move == "DOWN") or (_move ==1):
+            return MOVE.UP
+        elif(_move == "LEFT") or (_move ==2):
+            return MOVE.RIGHT
+        elif(_move == "UP") or (_move ==3):
+            return MOVE.DOWN
+        elif(_move == "RIGHT") or (_move ==4):
+            return MOVE.LEFT
+        else:
+            return MOVE.NEUTRAL

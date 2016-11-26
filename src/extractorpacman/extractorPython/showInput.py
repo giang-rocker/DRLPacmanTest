@@ -123,36 +123,6 @@ def calculate_value_game_state(input_layer, readout, h_fc1, sess, gameState):
      
     return action_index
 
-# END OF RUNING GAME
-
-
-    #LOAD NET
-    # saving and loading networks
-    
-    directory = 'LogGameFile'
-
-    numOfLogGameFile = len([item for item in os.listdir(directory) if os.path.isfile(os.path.join(directory, item))])
-    #NUM_OF_LEARNED_GAME = numOfLogGameFile
-    print("START OF TRAINING BY SUPERVISED NETWORK")
-     #first state
-     
-    for i in range (0,NUM_OF_LEARNED_GAME):
-        
-        nameLogFile =directory+"/F0000"[:-len(str(i))] + str(i)
-        logFile = LogFile(nameLogFile)
-        
-        gameState = logFile.get_all_game_state()
-        
-        tranning_network(s, readout, h_fc1, sess, gameState,train_step, socket,saver,i)
-        
-        
-        
-    print("DONE SUPERVISED LEARNING")   
-        
-    return 
-
-
-#MAIN
 
 
 sess = tf.InteractiveSession()

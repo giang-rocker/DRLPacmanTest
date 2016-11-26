@@ -154,7 +154,7 @@ public class RunGameByCNN {
 
             }  
            else if (game.gameOver()) {
-                    pw.println("GAME_OVER - Score :" + game.getScore() + " T: " + game.getTotalTime() +" L: "+ game.getCurrentLevel() + " R: "  +((int) (perRandom*100/game.getTotalTime())));
+                    pw.println("GAME "+ numOfGame +" OVER - Score :" + game.getScore() + " T: " + game.getTotalTime() +" L: "+ game.getCurrentLevel() + " R: "  +((int) (perRandom*100/game.getTotalTime())));
                     
                 } 
             

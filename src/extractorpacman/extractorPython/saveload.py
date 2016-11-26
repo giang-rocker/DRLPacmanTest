@@ -139,8 +139,11 @@ for i in range (0 , 4):
     Parse.maze.append(Parse.parse_maze_info(listFileName[i]))
 # GET ALL GAME STATES
 
+target = open("logCNN/logError.txt", 'r')
 
- 
+num_lines = sum(1 for line in target)+1
+
+print(num_lines)
 
 input_layer, readout, h_fc1 = createNetwork()
 
@@ -154,7 +157,7 @@ gameState.append("0,44,100,44,0,934,LEFT,3,false,498,0,0,NEUTRAL,1292,0,16,NEUTR
 
 
 sess.run(tf.initialize_all_variables())
-
+"""
 checkpoint = tf.train.get_checkpoint_state("saved_networks")
 if checkpoint and checkpoint.model_checkpoint_path:
     saver.restore(sess, checkpoint.model_checkpoint_path)
@@ -162,12 +165,18 @@ if checkpoint and checkpoint.model_checkpoint_path:
 else:
     print ("Could not find old network weights")
 
-
 print("AFTER LOAD NET")
 for gt in gameState:
     calculate_value_game_state(input_layer, readout, h_fc1, sess, gt)
 
-
+"""
 
 print("GAME_OVER")
 
+
+move = MOVE.UP
+print(str(move))
+print(str(MOVE.get_opposite_move(move)))
+
+if (MOVE.get_opposite_move(MOVE.DOWN)==move):
+    print("CHECK RIGHT")

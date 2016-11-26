@@ -23,17 +23,15 @@ EXPLORE = 500000 # frames over which to anneal epsilon
 FINAL_EPSILON = 0.05 # final value of epsilon
 INITIAL_EPSILON = 1 # starting value of epsilon
 REPLAY_MEMORY = 200000 # number of previous transitions to remember
-BATCH = 64 # size of minibatch
-K = 1 # only select an action every Kth frame, repeat prev for others
+REPLAY_CURRENT_MEMORY = 4000 # last 4k step of current game
+BATCH = 32 # size of minibatch
 SIZEX = 30
 SIZEY=30
 NUM_OF_FRAME = 11
-TRANING_TIME = 200
-SAVING_STEP =20
+TRANING_TIME = 100
 LEARNING_RATE =0.0005
 SKIP_FRAME = 4
 NUM_OF_LEARNED_GAME = 10
-TRANING_CURRENT_TIME = 1
 #NO_NEED_RANDOM = True
 
 def weight_variable(shape):
@@ -281,7 +279,7 @@ y = tf.placeholder("float", [None])
 readout_action = tf.reduce_sum(tf.mul(readout, a), reduction_indices = 1)    
 cost = tf.reduce_mean(tf.square(y - readout_action))
 train_step = tf.train.AdamOptimizer(LEARNING_RATE).minimize(cost)
-saver = tf.train.Saver(max_to_keep=None)
+saver = tf.train.Saver()
 
 
 sess.run(tf.initialize_all_variables())
@@ -345,7 +343,7 @@ while(terminator==False):
        
         
         # add all 10k gameState to Domain
-
+        totalTimeStep +=len(logGame)
         lastValidMove = MOVE.LEFT
         lastAction  = MOVE.NEUTRAL
         oldScore =0
@@ -407,8 +405,6 @@ while(terminator==False):
             #D.append((s_t, a_t, r_t, s_t1, terminal))
             #r_t = finalScore - originalObject[nextFrame].score
             currentDomain.insert(0,(s_t, a_t, r_t, s_t1, terminal))
-            #if len(currentDomain) > REPLAY_CURRENT_MEMORY:
-            #   currentDomain.popleft()
             
             if(terminal):        
                 i +=1
@@ -455,7 +451,7 @@ while(terminator==False):
                     input_layer : s_j_batch})
                 
         # END TRANING CURRENT GAME
-        totalTimeStep +=len(currentDomain)
+        
         #ADD TO CURRENT DOMAIN TO GLOBAL DOMAIN
         for d in currentDomain:
             D.append(d)
@@ -466,7 +462,7 @@ while(terminator==False):
         #print(len(D))
         avgError = error/5
         
-        if(totalTimeStep>REPLAY_MEMORY  ):         
+        if(totalTimeStep>OBSERVE  ):         
             #batch = min(BATCH, len(D))
             #training TRANING_TIME times with BATCH size
             for i in range (0,TRANING_TIME):

@@ -24,11 +24,11 @@ FINAL_EPSILON = 0.05 # final value of epsilon
 INITIAL_EPSILON = 1 # starting value of epsilon
 REPLAY_MEMORY = 200000 # number of previous transitions to remember
 REPLAY_CURRENT_MEMORY = 4000 # last 4k step of current game
-BATCH = 32 # size of minibatch
+BATCH = 64 # size of minibatch
 SIZEX = 30
 SIZEY=30
 NUM_OF_FRAME = 11
-TRANING_TIME = 100
+TRANING_TIME = 200
 LEARNING_RATE =0.0005
 SKIP_FRAME = 4
 NUM_OF_LEARNED_GAME = 10
@@ -306,7 +306,7 @@ numOfGame =0
 epsilon = INITIAL_EPSILON
 totalTimeStep  =0
 
-
+"""
 #LOAD NETWORK INCASE ALREADY LEARNING
 checkpoint = tf.train.get_checkpoint_state("saved_networks")
 if checkpoint and checkpoint.model_checkpoint_path:
@@ -315,6 +315,7 @@ if checkpoint and checkpoint.model_checkpoint_path:
 else:
     print ("Could not find old network weights")
 
+"""
 
 #SUPERVISEDLEARNING
 #supervised_learning(input_layer, readout, h_fc1, sess, train_step,sock,saver)
@@ -343,14 +344,11 @@ while(terminator==False):
        
         
         # add all 10k gameState to Domain
-        totalTimeStep +=len(logGame)
-        lastValidMove = MOVE.LEFT
-        lastAction  = MOVE.NEUTRAL
-        oldScore =0
         lenX =  len(logGame)
+        totalTimeStep +=lenX
+        
         originalObject =[]
         originalFrame =[]
-        count =0 
         #PARSE GAME STATE - ADD FIRST, LAST AND ALL POS HAVE X Y %4 ==0
         currentObject =Parse.parse_game_state(logGame[0])
         originalObject.append(currentObject)
@@ -370,6 +368,7 @@ while(terminator==False):
         originalObject.append(currentObject)
         originalFrame.append(Frame.get_input_network(currentObject))
         # END ADD CURRENT DOMAIN
+        
         
         lenX = len(originalObject)
         currentDomain = deque()
@@ -523,7 +522,7 @@ while(terminator==False):
         target.close()
         """
         # edit epsilon
-        if epsilon >= FINAL_EPSILON and totalTimeStep> REPLAY_MEMORY:
+        if epsilon >= FINAL_EPSILON and totalTimeStep> OBSERVE:
             print("REDUCE EPSILON")
             epsilon -= FINAL_EPSILON/2
         
